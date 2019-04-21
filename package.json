@@ -1,0 +1,27 @@
+{
+  "name": "recipe-app-prototype",
+  "version": "1.0.0",
+  "description": "Recipe tracking application.",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/matt-winzer/recipe-app-prototype.git"
+  },
+  "author": "Matt Winzer",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/matt-winzer/recipe-app-prototype/issues"
+  },
+  "homepage": "https://github.com/matt-winzer/recipe-app-prototype#readme",
+  "dependencies": {
+    "dotenv": "^7.0.0",
+    "express": "^4.16.4",
+    "pg": "^7.10.0",
+    "pg-hstore": "^2.3.2",
+    "sequelize": "^5.7.1",
+    "sequelize-cli": "^5.4.0"
+  }
+}
