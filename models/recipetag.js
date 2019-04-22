@@ -6,11 +6,11 @@ module.exports = (sequelize, DataTypes) => {
   }, {});
   recipeTag.associate = function(models) {
     // associations can be defined here
-    recipeTag.belongsToMany(models.recipe, {
+    recipeTag.belongsTo(models.recipe, {
       foreignKey: 'recipeId',
       onDelete: 'CASCADE'
     })
-    recipeTag.belongsToMany(models.tag, {
+    recipeTag.belongsTo(models.tag, {
       foreignKey: 'tagId',
       onDelete: 'CASCADE'
     })
