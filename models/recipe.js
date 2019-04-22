@@ -19,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
     recipe.hasMany(models.instruction, {
       foreignKey: 'recipeId'
     })
-    recipe.hasMany(models.tag, {
+    recipe.belongsToMany(models.tag, {
       through: 'recipeTags',
       foreignKey: 'recipeId',
       otherKey: 'tagId'
