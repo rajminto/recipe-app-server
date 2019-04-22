@@ -13,8 +13,10 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'userId',
       onDelete: 'CASCADE'
     })
-
     recipe.hasMany(models.ingredient, {
+      foreignKey: 'recipeId'
+    })
+    recipe.hasMany(models.instruction, {
       foreignKey: 'recipeId'
     })
   };
