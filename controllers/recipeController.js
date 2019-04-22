@@ -5,6 +5,8 @@ const models = require('../models')
 
 const getAllRecipes = (req, res, next) => {
   models.recipe.findAll({
+    // TODO: only return selected attributes
+      // EX. user.name
     include: [
       { model: models.user },
       'ingredients',
@@ -22,9 +24,9 @@ const getAllRecipes = (req, res, next) => {
 }
 
 const getRecipeById = (req, res, next) => {
-  // TODO: handle requests for id's not present
-
   models.recipe.findByPk(req.params.id, {
+    // TODO: only return selected attributes
+      // EX. user.name
     include: [
       { model: models.user },
       'ingredients',
@@ -33,7 +35,9 @@ const getRecipeById = (req, res, next) => {
     ]
   })
     .then(recipe => {
-      res.json({ recipe })
+      recipe
+        ? res.json({ recipe })
+        : res.status(400).json({ message: 'Recipe not found. Please try again.' })
     })
     .catch(error => {
       console.log(error)
