@@ -1,0 +1,23 @@
+{
+  "development": {
+    "username": "matthewwinzer",
+    "password": null,
+    "database": "recipe_app",
+    "host": "127.0.0.1",
+    "dialect": "postgresql"
+  },
+  "test": {
+    "username": "matthewwinzer",
+    "password": null,
+    "database": "recipe_app",
+    "host": "127.0.0.1",
+    "dialect": "postgresql"
+  },
+  "production": {
+    "username": "matthewwinzer",
+    "password": null,
+    "database": "recipe_app",
+    "host": "127.0.0.1",
+    "dialect": "postgresql"
+  }
+}
