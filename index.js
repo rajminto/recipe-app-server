@@ -5,8 +5,8 @@ const PORT = process.env.PORT || 3000
 // TODO: add CORS
 // TODO: add bodyParser
 
-// Import Sequelize models
-const models = require('./models')
+// Routers
+const recipesRouter = require('./routes/recipes')
 
 app.get('/', (req, res, next) => {
   res.json({
@@ -14,43 +14,7 @@ app.get('/', (req, res, next) => {
   })
 })
 
-app.get('/api/recipes', (req, res, next) => {
-  models.recipe.findAll({
-    include: [
-      { model: models.user },
-      'ingredients',
-      'instructions',
-      'tags'
-    ]
-  })
-    .then(recipes => {
-      res.json({ recipes })
-    })
-    .catch(error => {
-      console.log(error)
-      res.status(400).json({ message: 'Something went wrong...' })
-    })
-})
-
-app.get('/api/recipes/:id', (req, res, next) => {
-  // TODO: handle requests for id's not present
-  
-  models.recipe.findByPk(req.params.id, {
-    include: [
-      { model: models.user },
-      'ingredients',
-      'instructions',
-      'tags'
-    ]
-  })
-    .then(recipe => {
-      res.json({ recipe })
-    })
-    .catch(error => {
-      console.log( error)
-      res.status(400).json({ message: 'Something went wrong...' })
-    })
-})
+app.use('/api/recipes', recipesRouter)
 
 // TODO: add error handling
 
