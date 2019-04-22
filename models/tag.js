@@ -7,7 +7,7 @@ module.exports = (sequelize, DataTypes) => {
   tag.associate = function(models) {
     // associations can be defined here
     tag.belongsToMany(models.recipe, {
-      through: 'recipeTag',
+      through: 'recipeTags',
       foreignKey: 'tagId',
       otherKey: 'recipeId'
     })
