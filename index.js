@@ -32,6 +32,26 @@ app.get('/api/recipes', (req, res, next) => {
     })
 })
 
+app.get('/api/recipes/:id', (req, res, next) => {
+  // TODO: handle requests for id's not present
+  
+  models.recipe.findByPk(req.params.id, {
+    include: [
+      { model: models.user },
+      'ingredients',
+      'instructions',
+      'tags'
+    ]
+  })
+    .then(recipe => {
+      res.json({ recipe })
+    })
+    .catch(error => {
+      console.log( error)
+      res.status(400).json({ message: 'Something went wrong...' })
+    })
+})
+
 // TODO: add error handling
 
 app.listen(PORT, (something) => console.log(`Server listening on port: ${PORT}`))
