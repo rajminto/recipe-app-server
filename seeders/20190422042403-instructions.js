@@ -12,58 +12,40 @@ module.exports = {
         isBetaMember: false
       }], {});
     */
-    return queryInterface.bulkInsert('ingredients', [
+    return queryInterface.bulkInsert('instructions', [
       {
-        name: 'cloves of garlic',
-        quantity: 2,
+        description: 'Do something',
+        order: 1,
         createdAt: new Date(),
         updatedAt: new Date(),
         recipeId: 1
       }, {
-        name: 'tablespoons of olive oil',
-        quantity: 2,
+        description: 'Do something else',
+        order: 2,
         createdAt: new Date(),
         updatedAt: new Date(),
         recipeId: 1
       }, {
-        name: 'large white onions',
-        quantity: 3,
+        description: 'Do another thing',
+        order: 3,
         createdAt: new Date(),
         updatedAt: new Date(),
         recipeId: 1
       }, {
-        name: 'pound of ground beef',
-        quantity: 1,
+        description: 'Keep going',
+        order: 4,
         createdAt: new Date(),
         updatedAt: new Date(),
         recipeId: 1
       }, {
-        name: 'cans of cannellini',
-        quantity: 2,
+        description: 'Wait a while',
+        order: 5,
         createdAt: new Date(),
         updatedAt: new Date(),
         recipeId: 1
       }, {
-        name: 'can of red kidney beans',
-        quantity: 1,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        recipeId: 1
-      }, {
-        name: 'cans of pinto beans',
-        quantity: 2,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        recipeId: 1
-      }, {
-        name: 'small can of tomato paste',
-        quantity: 1,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        recipeId: 1
-      }, {
-        name: 'cans of diced tomatoes',
-        quantity: 2,
+        description: 'Finishing touches',
+        order: 6,
         createdAt: new Date(),
         updatedAt: new Date(),
         recipeId: 1
@@ -79,6 +61,6 @@ module.exports = {
       Example:
       return queryInterface.bulkDelete('People', null, {});
     */
-    return queryInterface.bulkDelete('ingredients', null, {});
+    return queryInterface.bulkDelete('instructions', null, {});
   }
 };
