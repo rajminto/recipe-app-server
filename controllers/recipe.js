@@ -43,7 +43,7 @@ const getRecipeById = (req, res, next) => {
     .catch(next)
 }
 
-const postRecipe = (req, res, next) => {
+const createRecipe = (req, res, next) => {
   const {
     name,
     description,
@@ -67,5 +67,5 @@ const postRecipe = (req, res, next) => {
 module.exports = {
   getAllRecipes,
   getRecipeById,
-  postRecipe
+  createRecipe
 }
