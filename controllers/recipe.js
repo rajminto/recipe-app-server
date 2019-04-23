@@ -49,14 +49,32 @@ const createRecipe = (req, res, next) => {
     description,
     prep_time,
     cook_time,
-    userId
+    userId,
+    ingredients,
+    instructions,
+    tags
   } = req.body
+
+  console.log(req.body.ingredients)
   
   // TODO: add better validation
   if (!name || !description || !prep_time || !cook_time || !userId) {
     res.status(400).json({ message: 'Please enter a name, description, prep time, and cook time.' })
   } else {
-  Recipe.create(req.body)
+  Recipe.create({
+    name,
+    description,
+    prep_time,
+    cook_time,
+    userId,
+    ingredients,
+    instructions,
+    tags
+  }, {
+    include: [
+      { model: Ingredient }
+    ]
+  })
     .then(newRecipe => {
       res.json({ message: 'Created new recipe.', recipe: newRecipe })
     })
