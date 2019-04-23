@@ -6,9 +6,11 @@ const PORT = process.env.PORT || 3000
 // TODO: add bodyParser
 
 const morgan = require('morgan')
+const cors = require('cors')
 
 // Middleware
 app.use(morgan(process.env.NODE_ENV !== 'production' ? 'dev' : 'combined'))
+app.use(cors({ origin: true, credentials: true }))
 
 // Routers
 const recipesRouter = require('./routes/recipes')
