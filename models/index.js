@@ -1,6 +1,6 @@
 'use strict';
 require('dotenv').config()
-// console.log(process.env.DATABASE_URL)
+
 const fs = require('fs');
 const path = require('path');
 const Sequelize = require('sequelize');
