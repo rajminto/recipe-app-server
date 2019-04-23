@@ -74,6 +74,7 @@ const createRecipe = (req, res, next) => {
     include: [
       { model: Ingredient },
       { model: Instruction },
+      { model: Tag }
     ]
   })
     .then(newRecipe => {
