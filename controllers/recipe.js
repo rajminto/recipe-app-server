@@ -20,10 +20,7 @@ const getAllRecipes = (req, res, next) => {
     .then(recipes => {
       res.json({ recipes })
     })
-    .catch(error => {
-      console.log(error)
-      res.status(400).json({ message: 'Something went wrong...' })
-    })
+    .catch(next)
 }
 
 const getRecipeById = (req, res, next) => {
@@ -43,10 +40,7 @@ const getRecipeById = (req, res, next) => {
         ? res.json({ recipe })
         : res.status(400).json({ message: 'Recipe not found. Please try again.' })
     })
-    .catch(error => {
-      console.log(error)
-      res.status(400).json({ message: 'Something went wrong...' })
-    })
+    .catch(next)
 }
 
 module.exports = {
