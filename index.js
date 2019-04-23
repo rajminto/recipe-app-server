@@ -2,13 +2,13 @@ const express = require('express')
 const app = express()
 const PORT = process.env.PORT || 3000
 
-// TODO: add CORS
-// TODO: add bodyParser
-
 const morgan = require('morgan')
 const cors = require('cors')
+const bodyParser = require('body-parser')
 
 // Middleware
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: false }))
 app.use(morgan(process.env.NODE_ENV !== 'production' ? 'dev' : 'combined'))
 app.use(cors({ origin: true, credentials: true }))
 
