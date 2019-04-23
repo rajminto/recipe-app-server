@@ -64,6 +64,18 @@ const createRecipe = (req, res, next) => {
   }
 }
 
+const deleteRecipeById = (req, res, next) => {
+  Recipe.destroy({
+    where: { id: req.params.id }
+  })
+    .then(deletedRecipe => {
+      deletedRecipe
+        ? res.json({ message: 'Recipe deleted.' })
+        : res.status(400).json({ message: 'Recipe not found. Please try again.' })
+    })
+    .catch(next)
+}
+
 // ------------------------------ Helper Functions ------------------------------
 
 function createRecipeObject({ name, description, prep_time, cook_time, ingredients, instructions, tags, userId }) {
@@ -82,5 +94,6 @@ function createRecipeObject({ name, description, prep_time, cook_time, ingredien
 module.exports = {
   getAllRecipes,
   getRecipeById,
-  createRecipe
+  createRecipe,
+  deleteRecipeById
 }
