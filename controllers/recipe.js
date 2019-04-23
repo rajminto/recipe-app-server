@@ -62,7 +62,7 @@ const createRecipe = (req, res, next) => {
     ]
   })
     .then(newRecipe => {
-      res.json({ message: 'Created new recipe.', recipe: newRecipe })
+      res.status(201).json({ message: 'Created new recipe.', recipe: newRecipe })
     })
     .catch(next)
   }
