@@ -14,12 +14,7 @@ app.use(morgan(process.env.NODE_ENV !== 'production' ? 'dev' : 'combined'))
 const recipesRouter = require('./routes/recipes')
 
 // Routes
-app.get('/', (req, res, next) => {
-  res.json({
-    message: 'Server running!'
-  })
-})
-
+app.get('/', (req, res, next) => res.json({ message: 'Server running!' }))
 app.use('/api/recipes', recipesRouter)
 
 // Error handling
