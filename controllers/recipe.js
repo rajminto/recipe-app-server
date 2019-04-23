@@ -51,16 +51,16 @@ const createRecipe = (req, res, next) => {
   else if (!validIngredients(recipe.ingredients))   res.status(400).json({ message: 'Please enter at least one ingredient with a name and quantity.' })
   else if (!validInstructions(recipe.instructions)) res.status(400).json({ message: 'Please enter at least one instruction with a description.' })
   else {
-  // Create recipe once passed validation
-  Recipe.create(createRecipeObject(recipe), {
-    include: [
-      { model: Ingredient },
-      { model: Instruction },
-      { model: Tag }
-    ]
-  })
-    .then(newRecipe => res.status(201).json({ message: 'Created new recipe.', recipe: newRecipe }))
-    .catch(next)
+    // Create recipe once passed validation
+    Recipe.create(createRecipeObject(recipe), {
+      include: [
+        { model: Ingredient },
+        { model: Instruction },
+        { model: Tag }
+      ]
+    })
+      .then(newRecipe => res.status(201).json({ message: 'Created new recipe.', recipe: newRecipe }))
+      .catch(next)
   }
 }
 
@@ -75,8 +75,7 @@ function createRecipeObject({ name, description, prep_time, cook_time, ingredien
     userId,
     ingredients,
     instructions,
-    tags,
-    userId
+    tags
   }
 }
 

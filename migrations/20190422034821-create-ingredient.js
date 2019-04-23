@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 module.exports = {
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('ingredients', {
@@ -31,9 +31,10 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE
       }
-    });
+    })
   },
+  // eslint-disable-next-line
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('ingredients');
+    return queryInterface.dropTable('ingredients')
   }
-};
+}

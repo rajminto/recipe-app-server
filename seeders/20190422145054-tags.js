@@ -1,6 +1,7 @@
-'use strict';
+'use strict'
 
 module.exports = {
+  // eslint-disable-next-line
   up: (queryInterface, Sequelize) => {
     /*
       Add altering commands here.
@@ -10,7 +11,7 @@ module.exports = {
       return queryInterface.bulkInsert('People', [{
         name: 'John Doe',
         isBetaMember: false
-      }], {});
+      }], {})
     */
     return queryInterface.bulkInsert('tags', [
       {
@@ -34,17 +35,17 @@ module.exports = {
         createdAt: new Date(),
         updatedAt: new Date()
       }
-    ], {});
+    ], {})
   },
-
+  // eslint-disable-next-line
   down: (queryInterface, Sequelize) => {
     /*
       Add reverting commands here.
       Return a promise to correctly handle asynchronicity.
 
       Example:
-      return queryInterface.bulkDelete('People', null, {});
+      return queryInterface.bulkDelete('People', null, {})
     */
-    return queryInterface.bulkDelete('tags', null, {});
+    return queryInterface.bulkDelete('tags', null, {})
   }
-};
+}

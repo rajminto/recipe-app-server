@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 module.exports = (sequelize, DataTypes) => {
   const recipe = sequelize.define('recipe', {
     name: DataTypes.STRING,
@@ -6,7 +6,7 @@ module.exports = (sequelize, DataTypes) => {
     img_url: DataTypes.STRING,
     prep_time: DataTypes.STRING,
     cook_time: DataTypes.STRING
-  }, {});
+  }, {})
   recipe.associate = function(models) {
     // associations can be defined here
     recipe.belongsTo(models.user, {
@@ -24,6 +24,6 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'recipeId',
       otherKey: 'tagId'
     })
-  };
-  return recipe;
-};
+  }
+  return recipe
+}

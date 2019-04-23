@@ -16,23 +16,26 @@ app.use(cors({ origin: true, credentials: true }))
 const recipesRouter = require('./routes/recipes')
 
 // Routes
-app.get('/', (req, res, next) => res.json({ message: 'Server running!' }))
+app.get('/', (req, res) => res.json({ message: 'Server running!' }))
 app.use('/api/recipes', recipesRouter)
 
 // Error handling
 app.use(notFound)
 app.use(errorHandler)
 
+// eslint-disable-next-line
 function notFound(req, res, next) {
   res.status(404).send({ error: 'Not found!', status: 404, url: req.originalUrl })
 }
 
 // eslint-disable-next-line
 function errorHandler(err, req, res, next) {
+  // eslint-disable-next-line
   console.error('ERROR', err)
   const stack = process.env.NODE_ENV !== 'production' ? err.stack : undefined
   res.status(500).send({ error: err.message, stack, url: req.originalUrl })
 }
 
+// eslint-disable-next-line
 app.listen(PORT, () => console.log(`Server listening on port: ${PORT}`))
 
