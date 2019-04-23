@@ -1,4 +1,5 @@
 require('dotenv').config()
+// eslint-disable-next-line
 const fs = require('fs')
 
 module.exports = {
@@ -11,4 +12,4 @@ module.exports = {
   production: {
     use_env_variable: 'DATABASE_URL'
   }
-};
+}

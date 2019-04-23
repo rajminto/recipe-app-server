@@ -1,9 +1,9 @@
-'use strict';
+'use strict'
 module.exports = (sequelize, DataTypes) => {
   const recipeTag = sequelize.define('recipeTag', {
     recipeId: DataTypes.INTEGER,
     tagId: DataTypes.INTEGER
-  }, {});
+  }, {})
   recipeTag.associate = function(models) {
     // associations can be defined here
     recipeTag.belongsTo(models.recipe, {
@@ -14,6 +14,6 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'tagId',
       onDelete: 'CASCADE'
     })
-  };
-  return recipeTag;
-};
+  }
+  return recipeTag
+}
