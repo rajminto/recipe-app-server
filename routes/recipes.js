@@ -5,5 +5,6 @@ const controller = require('../controllers/recipe')
 
 router.get('/', controller.getAllRecipes)
 router.get('/:id', controller.getRecipeById)
+router.post('/', controller.postRecipe)
 
 module.exports = router

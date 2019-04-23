@@ -43,7 +43,29 @@ const getRecipeById = (req, res, next) => {
     .catch(next)
 }
 
+const postRecipe = (req, res, next) => {
+  const {
+    name,
+    description,
+    prep_time,
+    cook_time,
+    userId
+  } = req.body
+  
+  // TODO: add better validation
+  if (!name || !description || !prep_time || !cook_time || !userId) {
+    res.status(400).json({ message: 'Please enter a name, description, prep time, and cook time.' })
+  } else {
+  Recipe.create(req.body)
+    .then(newRecipe => {
+      res.json({ message: 'Created new recipe.', recipe: newRecipe })
+    })
+    .catch(next)
+  }
+}
+
 module.exports = {
   getAllRecipes,
-  getRecipeById
+  getRecipeById,
+  postRecipe
 }
