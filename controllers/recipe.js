@@ -9,9 +9,9 @@ const getAllRecipes = (req, res, next) => {
   Recipe.findAll({
     include: [
       { model: User, attributes: ['name'] },
-      { model: Ingredient, attributes: ['name', 'quantity'] },
-      { model: Instruction, attributes: ['description', 'order'] },
-      { model: Tag, attributes: ['name'], through: { attributes: [] } }
+      { model: Ingredient, attributes: ['id', 'name', 'quantity'] },
+      { model: Instruction, attributes: ['id', 'description', 'order'] },
+      { model: Tag, attributes: ['id', 'name'], through: { attributes: [] } }
     ],
     order: [
       [Instruction, 'order', 'ASC']
@@ -30,9 +30,9 @@ const getRecipeById = (req, res, next) => {
   Recipe.findByPk(req.params.id, {
     include: [
       { model: User, attributes: ['name'] },
-      { model: Ingredient, attributes: ['name', 'quantity'] },
-      { model: Instruction, attributes: ['description', 'order'] },
-      { model: Tag, attributes: ['name'], through: { attributes: [] } }
+      { model: Ingredient, attributes: ['id', 'name', 'quantity'] },
+      { model: Instruction, attributes: ['id', 'description', 'order'] },
+      { model: Tag, attributes: ['id', 'name'], through: { attributes: [] } }
     ],
     order: [
       [Instruction, 'order', 'ASC']

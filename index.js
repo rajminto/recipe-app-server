@@ -18,5 +18,5 @@ app.use('/api/recipes', recipesRouter)
 
 // TODO: add error handling
 
-app.listen(PORT, (something) => console.log(`Server listening on port: ${PORT}`))
+app.listen(PORT, () => console.log(`Server listening on port: ${PORT}`))
 
