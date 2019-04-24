@@ -76,6 +76,47 @@ const deleteRecipeById = (req, res, next) => {
     .catch(next)
 }
 
+const updateRecipeById = (req, res, next) => {
+  // Find current recipe
+    // Update recipe attributes
+  // Find all current ingredients
+    // Update ingredients that exist
+    // Add ingredients that don't exist
+  // Find current instructions
+    // Update instructions that exist
+    // Add instructions that don't exist
+  // Find current tags
+    // Update tags that exist
+    // Add tags that don't exist
+
+  // ALTERNATIVE
+    // Find current recipe
+      // Update recipe attributes
+    // Destroy associated data
+    // Add associated data
+
+  // ALTERNATIVE 2
+    // Find current recipe
+    // Destroy current recipe
+    // Create new recipe
+
+  const { ingredients, instructions, tags } = req.body
+
+  Recipe.update(req.body, {
+    where: {
+      id: req.params.id
+    },
+    returning: true
+  })
+    .then(recipe => {
+      // upsert ingredients
+      
+    })
+    .catch(next)
+
+  
+}
+
 // ------------------------------ Helper Functions ------------------------------
 
 function createRecipeObject({ name, description, prep_time, cook_time, ingredients, instructions, tags, userId }) {
@@ -95,5 +136,6 @@ module.exports = {
   getAllRecipes,
   getRecipeById,
   createRecipe,
-  deleteRecipeById
+  deleteRecipeById,
+  updateRecipeById
 }
