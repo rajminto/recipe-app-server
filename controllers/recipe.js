@@ -77,44 +77,24 @@ const deleteRecipeById = (req, res, next) => {
 }
 
 const updateRecipeById = (req, res, next) => {
-  // Find current recipe
-    // Update recipe attributes
-  // Find all current ingredients
-    // Update ingredients that exist
-    // Add ingredients that don't exist
-  // Find current instructions
-    // Update instructions that exist
-    // Add instructions that don't exist
-  // Find current tags
-    // Update tags that exist
-    // Add tags that don't exist
-
-  // ALTERNATIVE
-    // Find current recipe
-      // Update recipe attributes
-    // Destroy associated data
-    // Add associated data
-
-  // ALTERNATIVE 2
-    // Find current recipe
-    // Destroy current recipe
-    // Create new recipe
-
+  // TODO: add validation
   const { ingredients, instructions, tags } = req.body
+  const recipeId = req.params.id
 
-  Recipe.update(req.body, {
-    where: {
-      id: req.params.id
-    },
-    returning: true
-  })
-    .then(recipe => {
-      // upsert ingredients
-      
+  const recipeUpdate        = generateUpdatePromise(Recipe, req.body, recipeId)
+  const ingredientUpserts   = generateBelongsToUpserts(Ingredient, ingredients, recipeId)
+  const instructionUpserts  = generateBelongsToUpserts(Instruction, instructions, recipeId)
+
+  // TODO: upsert tags
+    // TODO: write to join table
+  // const tagUpserts = tags.map(tag => Tag.upsert(tag))
+  
+  Promise.all([recipeUpdate, ...ingredientUpserts, ...instructionUpserts])
+    .then(promises => {
+      // console.log(promises)
+      res.json({ promises })
     })
     .catch(next)
-
-  
 }
 
 // ------------------------------ Helper Functions ------------------------------
@@ -130,6 +110,18 @@ function createRecipeObject({ name, description, prep_time, cook_time, ingredien
     instructions,
     tags
   }
+}
+
+function generateBelongsToUpserts(model, data, userId) {
+  return data.map(element => {
+    element.recipeId = userId
+    console.log(element)
+    return model.upsert(element)
+  })
+}
+
+function generateUpdatePromise(model, data, id) {
+  return model.update(data, { where: { id: id } })
 }
 
 module.exports = {
