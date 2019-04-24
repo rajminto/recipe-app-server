@@ -8,6 +8,8 @@ const Ingredient  = require('../models').ingredient
 const Instruction = require('../models').instruction
 const Tag         = require('../models').tag
 
+const db          = require('../models')
+
 const getAllRecipes = (req, res, next) => {
   Recipe.findAll({
     include: [
@@ -81,20 +83,23 @@ const updateRecipeById = (req, res, next) => {
   const { ingredients, instructions, tags } = req.body
   const recipeId = req.params.id
 
-  const recipeUpdate        = generateUpdatePromise(Recipe, req.body, recipeId)
-  const ingredientUpserts   = generateBelongsToUpserts(Ingredient, ingredients, recipeId)
-  const instructionUpserts  = generateBelongsToUpserts(Instruction, instructions, recipeId)
-
-  // TODO: upsert tags
-    // TODO: write to join table
-  // const tagUpserts = tags.map(tag => Tag.upsert(tag))
   
-  Promise.all([recipeUpdate, ...ingredientUpserts, ...instructionUpserts])
-    .then(promises => {
-      // console.log(promises)
-      res.json({ promises })
+  
+  db.sequelize.transaction(t => {
+
+    const recipeUpdate = generateUpdatePromise(Recipe, req.body, recipeId, t)
+    const ingredientUpserts = belongsToRecipeUpsert(Ingredient, ingredients, recipeId, t)
+    const instructionUpserts = belongsToRecipeUpsert(Instruction, instructions, recipeId, t)
+    const tagUpserts = belongsToManyRecipeUpsert(Tag, tags, recipeId, t)
+
+    return Promise.all([recipeUpdate, ...ingredientUpserts, ...instructionUpserts, ...tagUpserts])
+  })
+    .then(responses => {
+      res.json({ responses })
     })
     .catch(next)
+
+
 }
 
 // ------------------------------ Helper Functions ------------------------------
@@ -112,16 +117,30 @@ function createRecipeObject({ name, description, prep_time, cook_time, ingredien
   }
 }
 
-function generateBelongsToUpserts(model, data, userId) {
-  return data.map(element => {
-    element.recipeId = userId
-    console.log(element)
-    return model.upsert(element)
+function belongsToRecipeUpsert(Model, records, recipeId, transaction) {
+  // Return array of promises
+  return records.map(record => {
+    // Associate each record with recipe
+    record.recipeId = recipeId
+    return Model.upsert(record, { returning: true, transaction: transaction })
   })
 }
 
-function generateUpdatePromise(model, data, id) {
-  return model.update(data, { where: { id: id } })
+function belongsToManyRecipeUpsert(Model, records, recipeId, transaction) {
+  // Return array of promises
+  return records.map(record => {
+    return Model.upsert(record, { returning: true, transaction: transaction })
+      .then(upserted => {
+        const instance = upserted[0]
+        // Once records have been upserted, ensure they are associated with recipe
+        // Creates records in join table
+        return instance.addRecipe(recipeId, { transaction: transaction })
+      })
+  })
+}
+
+function generateUpdatePromise(model, data, id, transaction) {
+  return model.update(data, { where: { id: id } , returning: true, transaction: transaction })
 }
 
 module.exports = {
