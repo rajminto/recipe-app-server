@@ -2,11 +2,13 @@
 const { validRecipe, validIngredients, validInstructions } = require('../lib/validation/recipe')
 
 // Sequelize models
-const Recipe      = require('../models').recipe
-const User        = require('../models').user
-const Ingredient  = require('../models').ingredient
-const Instruction = require('../models').instruction
-const Tag         = require('../models').tag
+const db          = require('../models')
+const Recipe      = db.recipe
+const User        = db.user
+const Ingredient  = db.ingredient
+const Instruction = db.instruction 
+const Tag         = db.tag
+
 
 const getAllRecipes = (req, res, next) => {
   Recipe.findAll({
@@ -76,7 +78,38 @@ const deleteRecipeById = (req, res, next) => {
     .catch(next)
 }
 
-// ------------------------------ Helper Functions ------------------------------
+const updateRecipeById = (req, res, next) => {
+  // TODO: add validation
+  const { ingredients, instructions, tags } = req.body
+  const recipeId = req.params.id
+
+  // Initialize sequelize transaction to execute multiple queries as atomic operation
+  db.sequelize.transaction(t => {
+    // Create all db requests as promises
+    const recipeUpdate        = updateRecipePromise(Recipe, req.body, recipeId, t)
+    const ingredientUpserts   = belongsToRecipeUpserts(Ingredient, ingredients, recipeId, t)
+    const instructionUpserts  = belongsToRecipeUpserts(Instruction, instructions, recipeId, t)
+    const tagUpserts          = belongsToManyRecipeUpserts(Tag, tags, recipeId, t)
+
+    // Execute all db requests
+    return Promise
+      .all([
+        recipeUpdate,
+        ...ingredientUpserts,
+        ...instructionUpserts,
+        ...tagUpserts
+      ])
+  })
+    .then(() => {
+      // All requests succeeded: transaction committed
+      res.json({ message: 'Recipe updated.' })
+    })
+    .catch(next)
+    // At least one request failed: transaction rolled back
+    // TODO: custom error handling
+}
+
+// ------------------------------ Create Recipe Helpers ------------------------------
 
 function createRecipeObject({ name, description, prep_time, cook_time, ingredients, instructions, tags, userId }) {
   return {
@@ -91,9 +124,38 @@ function createRecipeObject({ name, description, prep_time, cook_time, ingredien
   }
 }
 
+// ------------------------------ Update Recipe Helpers ------------------------------
+
+function updateRecipePromise(model, data, id, transaction) {
+  return model.update(data, { where: { id: id } , transaction: transaction })
+}
+
+function belongsToRecipeUpserts(Model, records, recipeId, transaction) {
+  // Turn records into upsert db promise requests
+  return records.map(record => {
+    // Associate each record with recipe
+    record.recipeId = recipeId
+    return Model.upsert(record, { transaction: transaction })
+  })
+}
+
+function belongsToManyRecipeUpserts(Model, records, recipeId, transaction) {
+  // Turn records into upsert db promise requests
+  return records.map(record => {
+    return Model.upsert(record, { returning: true, transaction: transaction })
+      .then(upserted => {
+        const instance = upserted[0]
+        // Once records have been upserted, ensure they are associated with recipe
+        // Creates records in join table
+        return instance.addRecipe(recipeId, { transaction: transaction })
+      })
+  })
+}
+
 module.exports = {
   getAllRecipes,
   getRecipeById,
   createRecipe,
-  deleteRecipeById
+  deleteRecipeById,
+  updateRecipeById
 }
