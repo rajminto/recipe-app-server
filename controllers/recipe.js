@@ -19,7 +19,8 @@ const getAllRecipes = (req, res, next) => {
       { model: Tag, attributes: ['id', 'name'], through: { attributes: [] } }
     ],
     order: [
-      [Instruction, 'order', 'ASC']
+      ['id', 'ASC'],
+      [Instruction, 'order', 'ASC'],
     ]
   })
     .then(recipes => res.json({ recipes }))
@@ -35,7 +36,8 @@ const getRecipeById = (req, res, next) => {
       { model: Tag, attributes: ['id', 'name'], through: { attributes: [] } }
     ],
     order: [
-      [Instruction, 'order', 'ASC']
+      ['id', 'ASC'],
+      [Instruction, 'order', 'ASC'],
     ]
   })
     .then(recipe => {
