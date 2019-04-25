@@ -145,7 +145,7 @@ function belongsToManyRecipeUpserts(Model, records, recipeId, transaction) {
   return records.map(record => {
     return Model.upsert(record, { returning: true, transaction: transaction })
       .then(upserted => {
-        // Records have been upserted
+        // Record has been upserted
         const instance = upserted[0]
         const isNewRecord = upserted[1]
 
