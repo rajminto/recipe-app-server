@@ -100,9 +100,10 @@ const updateRecipeById = (req, res, next) => {
         ...tagUpserts
       ])
   })
-    .then(() => {
+    .then((responses) => {
       // All requests succeeded: transaction committed
-      res.json({ message: 'Recipe updated.' })
+      // console.log(respons)
+      res.json({ message: 'Recipe updated.', responses: responses })
     })
     .catch(next)
     // At least one request failed: transaction rolled back
@@ -144,10 +145,14 @@ function belongsToManyRecipeUpserts(Model, records, recipeId, transaction) {
   return records.map(record => {
     return Model.upsert(record, { returning: true, transaction: transaction })
       .then(upserted => {
+        // Records have been upserted
         const instance = upserted[0]
-        // Once records have been upserted, ensure they are associated with recipe
-        // Creates records in join table
-        return instance.addRecipe(recipeId, { transaction: transaction })
+        const isNewRecord = upserted[1]
+
+        // Associate new record with recipe
+        return isNewRecord
+          ? instance.addRecipe(recipeId, { transaction: transaction })
+          : false
       })
   })
 }
