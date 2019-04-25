@@ -21,6 +21,7 @@ const getAllRecipes = (req, res, next) => {
     order: [
       ['id', 'ASC'],
       [Instruction, 'order', 'ASC'],
+      [Ingredient, 'id', 'ASC']
     ]
   })
     .then(recipes => res.json({ recipes }))
@@ -38,6 +39,7 @@ const getRecipeById = (req, res, next) => {
     order: [
       ['id', 'ASC'],
       [Instruction, 'order', 'ASC'],
+      [Ingredient, 'id', 'ASC']
     ]
   })
     .then(recipe => {
