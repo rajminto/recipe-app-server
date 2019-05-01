@@ -6,8 +6,10 @@ module.exports = (sequelize, DataTypes) => {
   }, {})
   user.associate = function(models) {
     // associations can be defined here
-    user.hasMany(models.recipe, {
-      foreignKey: 'userId'
+    user.belongsToMany(models.recipe, {
+      through: 'userRecipes',
+      foreignKey: 'userId',
+      otherKey: 'recipeId'
     })
   }
   return user
