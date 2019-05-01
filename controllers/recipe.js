@@ -58,6 +58,7 @@ const createRecipe = (req, res, next) => {
   else if (!validInstructions(recipe.instructions)) res.status(400).json({ message: 'Please enter at least one instruction with a description.' })
   else {
     // Create recipe once passed validation
+    // TODO: refactor to implement all steps as one transaction
     Recipe.create(createRecipeObject(recipe), {
       include: [
         { model: Ingredient },
@@ -65,7 +66,11 @@ const createRecipe = (req, res, next) => {
         { model: Tag }
       ]
     })
-      .then(newRecipe => res.status(201).json({ message: 'Created new recipe.', recipe: newRecipe }))
+      .then(newRecipe => {
+        // Associate with user who POSTed
+        newRecipe.addUser(recipe.userId, { through: { createdBy: true }})
+        res.status(201).json({ message: 'Created new recipe.', recipe: newRecipe })
+      })
       .catch(next)
   }
 }
@@ -104,9 +109,8 @@ const updateRecipeById = (req, res, next) => {
         ...tagUpserts
       ])
   })
-    .then((responses) => {
+    .then(responses => {
       // All requests succeeded: transaction committed
-      // console.log(respons)
       res.json({ message: 'Recipe updated.', responses: responses })
     })
     .catch(next)
@@ -138,13 +142,12 @@ const searchRecipesByIngredient = (req, res, next) => {
 
 // ------------------------------ Create Recipe Helpers ------------------------------
 
-function createRecipeObject({ name, description, prep_time, cook_time, ingredients, instructions, tags, userId }) {
+function createRecipeObject({ name, description, prep_time, cook_time, ingredients, instructions, tags }) {
   return {
     name,
     description,
     prep_time,
     cook_time,
-    userId,
     ingredients,
     instructions,
     tags
@@ -153,8 +156,8 @@ function createRecipeObject({ name, description, prep_time, cook_time, ingredien
 
 // ------------------------------ Update Recipe Helpers ------------------------------
 
-function updateRecipePromise(model, data, id, transaction) {
-  return model.update(data, { where: { id: id } , transaction: transaction })
+function updateRecipePromise(Model, data, id, transaction) {
+  return Model.update(data, { where: { id: id } , transaction: transaction })
 }
 
 function belongsToRecipeUpserts(Model, records, recipeId, transaction) {
