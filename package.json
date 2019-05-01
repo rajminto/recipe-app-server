@@ -30,6 +30,7 @@
     "sequelize-cli": "^5.4.0"
   },
   "devDependencies": {
-    "eslint": "^5.16.0"
+    "eslint": "^5.16.0",
+    "faker": "^4.1.0"
   }
 }

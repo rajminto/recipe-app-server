@@ -114,6 +114,28 @@ const updateRecipeById = (req, res, next) => {
     // TODO: custom error handling
 }
 
+const searchRecipesByIngredient = (req, res, next) => {
+  const ingredient = req.query.ingredient
+  const Op = db.Sequelize.Op
+
+  Recipe.findAll({
+    include: [
+      { model: User, attributes: ['name'] },
+      {
+        model: Ingredient,
+        attributes: ['id', 'name', 'quantity'], 
+        where: { name: { [Op.iLike]: `%${ingredient}%` } }
+      },
+    ],
+    order: [
+      ['id', 'ASC'],
+      [Ingredient, 'id', 'ASC']
+    ]
+  })
+    .then(recipes => res.json({ recipes }))
+    .catch(next)
+}
+
 // ------------------------------ Create Recipe Helpers ------------------------------
 
 function createRecipeObject({ name, description, prep_time, cook_time, ingredients, instructions, tags, userId }) {
@@ -166,5 +188,6 @@ module.exports = {
   getRecipeById,
   createRecipe,
   deleteRecipeById,
-  updateRecipeById
+  updateRecipeById,
+  searchRecipesByIngredient
 }
