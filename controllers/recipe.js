@@ -13,8 +13,8 @@ const Tag         = db.tag
 const getAllRecipes = (req, res, next) => {
   Recipe.findAll({
     include: [
-      { model: User, attributes: ['name'] },
-      { model: Ingredient, attributes: ['id', 'name', 'quantity'] },
+      { model: User, attributes: ['id', 'name'], through: { where: { createdBy: true }, attributes: [] } },
+      { model: Ingredient, attributes: ['id', 'name'] },
       { model: Instruction, attributes: ['id', 'description', 'order'] },
       { model: Tag, attributes: ['id', 'name'], through: { attributes: [] } }
     ],
@@ -31,8 +31,8 @@ const getAllRecipes = (req, res, next) => {
 const getRecipeById = (req, res, next) => {
   Recipe.findByPk(req.params.id, {
     include: [
-      { model: User, attributes: ['name'] },
-      { model: Ingredient, attributes: ['id', 'name', 'quantity'] },
+      { model: User, attributes: ['id', 'name'], through: { where: { createdBy: true }, attributes: [] } },
+      { model: Ingredient, attributes: ['id', 'name'] },
       { model: Instruction, attributes: ['id', 'description', 'order'] },
       { model: Tag, attributes: ['id', 'name'], through: { attributes: [] } }
     ],
