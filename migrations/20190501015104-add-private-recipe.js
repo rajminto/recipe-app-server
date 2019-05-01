@@ -26,4 +26,4 @@ module.exports = {
     */
     return queryInterface.removeColumn('recipes', 'isPrivate')
   }
-};
+}
