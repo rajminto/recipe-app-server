@@ -58,20 +58,26 @@ const createRecipe = (req, res, next) => {
   else if (!validInstructions(recipe.instructions)) res.status(400).json({ message: 'Please enter at least one instruction with a description.' })
   else {
     // Create recipe once passed validation
-    // TODO: refactor to implement all steps as one transaction
-    Recipe.create(createRecipeObject(recipe), {
-      include: [
-        { model: Ingredient },
-        { model: Instruction },
-        { model: Tag }
-      ]
+    db.sequelize.transaction(async t => {
+      // Using async/await so that newRecipe can be returned on success
+      const newRecipe = await Recipe.create(createRecipeObject(recipe), {
+        include: [
+          { model: Ingredient },
+          { model: Instruction },
+          { model: Tag }
+        ],
+        transaction: t
+      })
+      await newRecipe.addUser(recipe.userId, { through: { createdBy: true }, transaction: t })
+      return newRecipe
     })
       .then(newRecipe => {
-        // Associate with user who POSTed
-        newRecipe.addUser(recipe.userId, { through: { createdBy: true }})
+        // All requests succeeded: transaction committed
         res.status(201).json({ message: 'Created new recipe.', recipe: newRecipe })
       })
       .catch(next)
+      // At least one request failed: transaction rolled back
+      // TODO: custom error handling
   }
 }
 
@@ -156,8 +162,8 @@ function createRecipeObject({ name, description, prep_time, cook_time, ingredien
 
 // ------------------------------ Update Recipe Helpers ------------------------------
 
-function updateRecipePromise(Model, data, id, transaction) {
-  return Model.update(data, { where: { id: id } , transaction: transaction })
+function updateRecipePromise(Model, data, recipeId, transaction) {
+  return Model.update(data, { where: { id: recipeId } , transaction: transaction })
 }
 
 function belongsToRecipeUpserts(Model, records, recipeId, transaction) {
