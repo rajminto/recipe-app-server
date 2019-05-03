@@ -22,7 +22,17 @@ const getTagById = (req, res, next) => {
     .catch(next)
 }
 
+const getTagByIdWithRecipes = (req, res, next) => {
+  Tag.findByPk(req.params.id)
+    .then(tag => tag.getRecipes())
+    .then(recipes => {
+      res.json({ recipes })
+    })
+    .catch(next)
+}
+
 module.exports = {
   getAllTags,
-  getTagById
+  getTagById,
+  getTagByIdWithRecipes
 }
