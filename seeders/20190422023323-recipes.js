@@ -22,7 +22,7 @@ module.exports = {
         cook_time: '1 hour',
         createdAt: new Date(),
         updatedAt: new Date(),
-        userId: 1
+        isPrivate: false
       }
     ], {})
   },

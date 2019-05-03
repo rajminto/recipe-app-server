@@ -9,9 +9,10 @@ module.exports = (sequelize, DataTypes) => {
   }, {})
   recipe.associate = function(models) {
     // associations can be defined here
-    recipe.belongsTo(models.user, {
-      foreignKey: 'userId',
-      onDelete: 'CASCADE'
+    recipe.belongsToMany(models.user, {
+      through: 'userRecipes',
+      foreignKey: 'recipeId',
+      otherKey: 'userId'
     })
     recipe.hasMany(models.ingredient, {
       foreignKey: 'recipeId'

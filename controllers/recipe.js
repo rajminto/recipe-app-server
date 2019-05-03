@@ -13,8 +13,8 @@ const Tag         = db.tag
 const getAllRecipes = (req, res, next) => {
   Recipe.findAll({
     include: [
-      { model: User, attributes: ['name'] },
-      { model: Ingredient, attributes: ['id', 'name', 'quantity'] },
+      { model: User, attributes: ['id', 'name'], through: { where: { createdBy: true }, attributes: [] } },
+      { model: Ingredient, attributes: ['id', 'name'] },
       { model: Instruction, attributes: ['id', 'description', 'order'] },
       { model: Tag, attributes: ['id', 'name'], through: { attributes: [] } }
     ],
@@ -31,8 +31,8 @@ const getAllRecipes = (req, res, next) => {
 const getRecipeById = (req, res, next) => {
   Recipe.findByPk(req.params.id, {
     include: [
-      { model: User, attributes: ['name'] },
-      { model: Ingredient, attributes: ['id', 'name', 'quantity'] },
+      { model: User, attributes: ['id', 'name'], through: { where: { createdBy: true }, attributes: [] } },
+      { model: Ingredient, attributes: ['id', 'name'] },
       { model: Instruction, attributes: ['id', 'description', 'order'] },
       { model: Tag, attributes: ['id', 'name'], through: { attributes: [] } }
     ],
@@ -58,15 +58,26 @@ const createRecipe = (req, res, next) => {
   else if (!validInstructions(recipe.instructions)) res.status(400).json({ message: 'Please enter at least one instruction with a description.' })
   else {
     // Create recipe once passed validation
-    Recipe.create(createRecipeObject(recipe), {
-      include: [
-        { model: Ingredient },
-        { model: Instruction },
-        { model: Tag }
-      ]
+    db.sequelize.transaction(async t => {
+      // Using async/await so that newRecipe can be returned on success
+      const newRecipe = await Recipe.create(createRecipeObject(recipe), {
+        include: [
+          { model: Ingredient },
+          { model: Instruction },
+          { model: Tag }
+        ],
+        transaction: t
+      })
+      await newRecipe.addUser(recipe.userId, { through: { createdBy: true }, transaction: t })
+      return newRecipe
     })
-      .then(newRecipe => res.status(201).json({ message: 'Created new recipe.', recipe: newRecipe }))
+      .then(newRecipe => {
+        // All requests succeeded: transaction committed
+        res.status(201).json({ message: 'Created new recipe.', recipe: newRecipe })
+      })
       .catch(next)
+      // At least one request failed: transaction rolled back
+      // TODO: custom error handling
   }
 }
 
@@ -104,9 +115,8 @@ const updateRecipeById = (req, res, next) => {
         ...tagUpserts
       ])
   })
-    .then((responses) => {
+    .then(responses => {
       // All requests succeeded: transaction committed
-      // console.log(respons)
       res.json({ message: 'Recipe updated.', responses: responses })
     })
     .catch(next)
@@ -138,13 +148,12 @@ const searchRecipesByIngredient = (req, res, next) => {
 
 // ------------------------------ Create Recipe Helpers ------------------------------
 
-function createRecipeObject({ name, description, prep_time, cook_time, ingredients, instructions, tags, userId }) {
+function createRecipeObject({ name, description, prep_time, cook_time, ingredients, instructions, tags }) {
   return {
     name,
     description,
     prep_time,
     cook_time,
-    userId,
     ingredients,
     instructions,
     tags
@@ -153,8 +162,8 @@ function createRecipeObject({ name, description, prep_time, cook_time, ingredien
 
 // ------------------------------ Update Recipe Helpers ------------------------------
 
-function updateRecipePromise(model, data, id, transaction) {
-  return model.update(data, { where: { id: id } , transaction: transaction })
+function updateRecipePromise(Model, data, recipeId, transaction) {
+  return Model.update(data, { where: { id: recipeId } , transaction: transaction })
 }
 
 function belongsToRecipeUpserts(Model, records, recipeId, transaction) {

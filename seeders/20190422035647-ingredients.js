@@ -15,56 +15,47 @@ module.exports = {
     */
     return queryInterface.bulkInsert('ingredients', [
       {
-        name: 'cloves of garlic',
-        quantity: 2,
+        name: '3 cloves of garlic',
         createdAt: new Date(),
         updatedAt: new Date(),
         recipeId: 1
       }, {
-        name: 'tablespoons of olive oil',
-        quantity: 2,
+        name: '2 tablespoons of olive oil',
         createdAt: new Date(),
         updatedAt: new Date(),
         recipeId: 1
       }, {
-        name: 'large white onions',
-        quantity: 3,
+        name: '3 large white onions',
         createdAt: new Date(),
         updatedAt: new Date(),
         recipeId: 1
       }, {
-        name: 'pound of ground beef',
-        quantity: 1,
+        name: '1 pound of ground beef',
         createdAt: new Date(),
         updatedAt: new Date(),
         recipeId: 1
       }, {
-        name: 'cans of cannellini',
-        quantity: 2,
+        name: '2 cans of cannellini',
         createdAt: new Date(),
         updatedAt: new Date(),
         recipeId: 1
       }, {
-        name: 'can of red kidney beans',
-        quantity: 1,
+        name: '1 can of red kidney beans',
         createdAt: new Date(),
         updatedAt: new Date(),
         recipeId: 1
       }, {
-        name: 'cans of pinto beans',
-        quantity: 2,
+        name: '2 cans of pinto beans',
         createdAt: new Date(),
         updatedAt: new Date(),
         recipeId: 1
       }, {
-        name: 'small can of tomato paste',
-        quantity: 1,
+        name: '1 small can of tomato paste',
         createdAt: new Date(),
         updatedAt: new Date(),
         recipeId: 1
       }, {
-        name: 'cans of diced tomatoes',
-        quantity: 2,
+        name: '2 cans of diced tomatoes',
         createdAt: new Date(),
         updatedAt: new Date(),
         recipeId: 1
