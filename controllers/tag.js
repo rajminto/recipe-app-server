@@ -15,7 +15,9 @@ const getTagById = (req, res, next) => {
     attributes: ['id', 'name', 'img_url']
   })
     .then(tag => {
-      res.json(tag)
+      tag
+        ? res.json(tag)
+        : res.status(404).json({ message: 'Tag not found. Please enter a valid ID.' })
     })
     .catch(next)
 }
