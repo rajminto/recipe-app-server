@@ -26,11 +26,14 @@ const getTagByIdWithRecipes = (req, res, next) => {
   Tag.findByPk(req.params.id)
     .then(tag => {
       return tag
+        // TODO?: return recipes with their accompanying ingredients, instructions, tags
         ? tag.getRecipes()
         : res.status(404).json({ message: 'Tag not found. Please enter a valid ID.' })
     })
     .then(recipes => {
-      res.json({ recipes })
+      recipes
+        ? res.json({ recipes })
+        : res.status(404).json({ message: 'No recipes found with that tag. Please select another tag.' })
     })
     .catch(next)
 }
