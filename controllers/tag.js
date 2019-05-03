@@ -10,6 +10,17 @@ const getAllTags =  (req, res, next) => {
     .catch(next)
 }
 
+const getTagById = (req, res, next) => {
+  Tag.findByPk(req.params.id, {
+    attributes: ['id', 'name', 'img_url']
+  })
+    .then(tag => {
+      res.json(tag)
+    })
+    .catch(next)
+}
+
 module.exports = {
-  getAllTags
+  getAllTags,
+  getTagById
 }
