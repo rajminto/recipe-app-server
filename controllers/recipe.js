@@ -45,7 +45,7 @@ const getRecipeById = (req, res, next) => {
     .then(recipe => {
       recipe
         ? res.json({ recipe })
-        : res.status(400).json({ message: 'Recipe not found. Please try again.' })
+        : res.status(404).json({ message: 'Recipe not found. Please enter a valid ID.' })
     })
     .catch(next)
 }
