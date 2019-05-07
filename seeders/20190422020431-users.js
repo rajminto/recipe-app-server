@@ -1,4 +1,6 @@
 'use strict'
+const bcrypt = require('bcrypt')
+const saltRounds = 10
 
 module.exports = {
   // eslint-disable-next-line
@@ -17,11 +19,13 @@ module.exports = {
       {
         name: 'Matt',
         email: 'matt@gmail.com',
+        password: bcrypt.hashSync(process.env.MATT_PW, saltRounds),
         createdAt: new Date(),
         updatedAt: new Date()
       }, {
         name: 'Ross',
         email: 'ross@gmail.com',
+        password: bcrypt.hashSync(process.env.ROSS_PW, saltRounds),
         createdAt: new Date(),
         updatedAt: new Date()
       }
