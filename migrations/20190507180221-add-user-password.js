@@ -16,6 +16,7 @@ module.exports = {
     )
   },
 
+  // eslint-disable-next-line
   down: (queryInterface, Sequelize) => {
     /*
       Add reverting commands here.
