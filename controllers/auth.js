@@ -7,12 +7,20 @@ const registerUser = (req, res, next) => {
   
   // Validate user
   // TODO: improve validation
-  if      (!validUser(req.body))                  res.json({ message: 'Please enter a username, email, and a password longer than 5 characters.' })
-  else if (!validPasswords(password, password2))  res.json({ message: 'Please enter matching passwords.' })
+  if      (!validUser(req.body))                    res.json({ message: 'Please enter a username, email, and a password longer than 5 characters.' })
+  else if (!matchingPasswords(password, password2)) res.json({ message: 'Please enter matching passwords.' })
   else {
     // Validation passed
     // Check if user already exists in db
-    
+    User.findOne({
+      where: { email: email }
+    })
+      .then(user => {
+        user
+          ? res.status(409).json({ message: 'This email has already been registered. Please enter a unique email address.' })
+          : res.json(req.body)
+      })
+  }
 
 }
 
@@ -29,7 +37,7 @@ function validUser({ name, email, password, password2 }) {
   return fieldsPresent && validName && validEmail && validPassword && validPassword2
 }
 
-function validPasswords(password1, password2) {
+function matchingPasswords(password1, password2) {
   return password1 === password2
 }
 
