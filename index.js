@@ -20,7 +20,8 @@ const usersRouter = require('./routes/users')
 // Routes
 app.get('/', (req, res) => res.json({ message: 'Server running!' }))
 app.use('/api/recipes', recipesRouter)
-app.use('/api/auth', usersRouter)
+app.use('/api/tags', tagsRouter)
+app.use('/api/users', usersRouter)
 
 // Error handling
 app.use(notFound)
