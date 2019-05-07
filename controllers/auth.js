@@ -1,3 +1,5 @@
+const bcrypt = require('bcrypt')
+
 // Sequelize models
 const User = require('../models').user
 
@@ -10,22 +12,34 @@ const registerUser = (req, res, next) => {
   if      (!validUser(req.body))                    res.json({ message: 'Please enter a username, email, and a password longer than 5 characters.' })
   else if (!matchingPasswords(password, password2)) res.json({ message: 'Please enter matching passwords.' })
   else {
-    // Validation passed
-    // Check if user already exists in db
+    // Validation passed: check if user already exists in db
     User.findOne({
       where: { email: email }
     })
       .then(user => {
-        user
-          ? res.status(409).json({ message: 'This email has already been registered. Please enter a unique email address.' })
-          : res.json(req.body)
+        const saltRounds = 10
+        // User exists: respond with error
+        // User doesn't exist: hash password
+        return user
+          ? res.status(409).json({ message: 'This email has already been registered. Please try again with a different email.' })
+          : bcrypt.hash(password, saltRounds)
       })
+      .then(hash => {
+        // Create new user with hashed password
+        res.json(createUserObject(name, email, hash))
+      //   return User.create(createUserObject(name, email, hash))
+      })
+      // .then(newUser => {
+        
+      //   res.status(201).json({ user: newUser })
+      // })
+      .catch(next)
   }
 
 }
 
 
-// ------------------------------ Vaidation Helpers ------------------------------
+// ------------------------------ Validation Helpers ------------------------------
 
 function validUser({ name, email, password, password2 }) {
   const fieldsPresent = name && email && password && password2
@@ -39,6 +53,16 @@ function validUser({ name, email, password, password2 }) {
 
 function matchingPasswords(password1, password2) {
   return password1 === password2
+}
+
+// ------------------------------ Create User Helpers ------------------------------
+
+function createUserObject(name, email, hash) {
+  return {
+    name: name,
+    email: email,
+    password: hash
+  }
 }
 
 module.exports = {
