@@ -15,11 +15,12 @@ app.use(cors({ origin: true, credentials: true }))
 // Routers
 const recipesRouter = require('./routes/recipes')
 const tagsRouter = require('./routes/tags')
+const usersRouter = require('./routes/users')
 
 // Routes
 app.get('/', (req, res) => res.json({ message: 'Server running!' }))
 app.use('/api/recipes', recipesRouter)
-app.use('/api/tags', tagsRouter)
+app.use('/api/auth', usersRouter)
 
 // Error handling
 app.use(notFound)
