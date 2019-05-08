@@ -18,21 +18,19 @@ const registerUser = (req, res, next) => {
     })
       .then(user => {
         const saltRounds = 10
-        // User exists: respond with error
-        // User doesn't exist: hash password
         return user
+          // User exists: respond with error
           ? res.status(409).json({ message: 'This email has already been registered. Please try again with a different email.' })
+          // User doesn't exist: hash password
           : bcrypt.hash(password, saltRounds)
       })
       .then(hash => {
         // Create new user with hashed password
-        res.json(createUserObject(name, email, hash))
-      //   return User.create(createUserObject(name, email, hash))
+        return User.create(createUserObject(name, email, hash))
       })
-      // .then(newUser => {
-        
-      //   res.status(201).json({ user: newUser })
-      // })
+      .then(newUser => {
+        res.status(201).json({ user: cleanUser(newUser) })
+      })
       .catch(next)
   }
 
@@ -63,6 +61,10 @@ function createUserObject(name, email, hash) {
     email: email,
     password: hash
   }
+}
+
+function cleanUser({ id, name, email }) {
+  return { id, name, email }
 }
 
 module.exports = {
