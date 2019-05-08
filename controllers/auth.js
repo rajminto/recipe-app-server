@@ -17,7 +17,7 @@ const registerUser = (req, res, next) => {
       where: { email: email }
     })
       .then(user => {
-        // User already exists, throw error and respond in .catch
+        // User already exists: throw error and respond in .catch
         if (user) throw new Error('existing user')
         else {
           // User doesn't exist: hash password

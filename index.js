@@ -1,3 +1,4 @@
+require('dotenv').config()
 const express = require('express')
 const app = express()
 const PORT = process.env.PORT || 3000
@@ -5,12 +6,22 @@ const PORT = process.env.PORT || 3000
 const morgan = require('morgan')
 const cors = require('cors')
 const bodyParser = require('body-parser')
+const session = require('express-session')
 
 // Middleware
 app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.urlencoded({ extended: true }))
 app.use(morgan(process.env.NODE_ENV !== 'production' ? 'dev' : 'combined'))
 app.use(cors({ origin: true, credentials: true }))
+
+// Express session middleware
+// TODO: Re-enable secure cookies in production
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave: true,
+  saveUninitialized: true,
+  // cookie: { secure: true }
+}))
 
 // Routers
 const recipesRouter = require('./routes/recipes')
