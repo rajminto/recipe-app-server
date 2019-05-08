@@ -9,20 +9,21 @@ const registerUser = (req, res, next) => {
   
   // Validate user
   // TODO: improve validation
-  if      (!validUser(req.body))                    res.json({ message: 'Please enter a username, email, and a password longer than 5 characters.' })
-  else if (!matchingPasswords(password, password2)) res.json({ message: 'Please enter matching passwords.' })
+  if      (!validUser(req.body))                    res.status(400).json({ message: 'Please enter a username, email, and a password longer than 5 characters.' })
+  else if (!matchingPasswords(password, password2)) res.status(400).json({ message: 'Please enter matching passwords.' })
   else {
     // Validation passed: check if user already exists in db
     User.findOne({
       where: { email: email }
     })
       .then(user => {
-        const saltRounds = 10
-        return user
-          // User exists: respond with error
-          ? res.status(409).json({ message: 'This email has already been registered. Please try again with a different email.' })
+        // User already exists, throw error and respond in .catch
+        if (user) throw new Error('existing user')
+        else {
           // User doesn't exist: hash password
-          : bcrypt.hash(password, saltRounds)
+          const saltRounds = 10
+          return bcrypt.hash(password, saltRounds)
+        }
       })
       .then(hash => {
         // Create new user with hashed password
@@ -31,14 +32,15 @@ const registerUser = (req, res, next) => {
       .then(newUser => {
         res.status(201).json({ user: cleanUser(newUser) })
       })
-      .catch(next)
+      .catch(err => {
+        if (err.message === 'existing user') res.status(409).json({ message: 'This email has already been registered. Please try again with a different email.' })
+        else next(err)
+      })
   }
-
 }
 
 
 // ------------------------------ Validation Helpers ------------------------------
-
 function validUser({ name, email, password, password2 }) {
   const fieldsPresent = name && email && password && password2
   const validName = typeof name === 'string'
