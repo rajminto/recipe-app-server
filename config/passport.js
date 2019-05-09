@@ -2,9 +2,9 @@ const LocalStrategy = require('passport-local').Strategy
 const bcrypt = require('bcrypt')
 
 // Sequelize models
-const User = require('../models').User
+const User = require('../models').user
 
-module.exports = (passport) => {
+module.exports = function(passport) {
   passport.use(
     new LocalStrategy({ usernameField: 'email' }, (email, password, done) => {
       // Match user
@@ -36,7 +36,7 @@ module.exports = (passport) => {
         else throw new Error('user not found')
       })
       .catch(err => {
-        done(err, {})
+        done(err, false)
       })
   })
 }

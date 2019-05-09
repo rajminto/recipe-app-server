@@ -1,4 +1,5 @@
 const bcrypt = require('bcrypt')
+const passport = require('passport')
 
 // Sequelize models
 const User = require('../models').user
@@ -40,7 +41,17 @@ const registerUser = (req, res, next) => {
 }
 
 const loginUser = (req, res, next) => {
-
+  passport.authenticate(
+    'local', 
+    (err, user, info) => {
+      if (err) return next(err)
+      // Info object contains custom error message from local strategy config
+      if (!user) return res.status(400).json(info)
+      req.logIn(user, (err) => {
+        if (err) return next(err)
+        return res.json({ message: 'You are now logged in!', user: user })
+      })
+    })(req, res, next)
 }
 
 
