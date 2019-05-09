@@ -39,6 +39,11 @@ const registerUser = (req, res, next) => {
   }
 }
 
+const loginUser = (req, res, next) => {
+
+}
+
+
 
 // ------------------------------ Validation Helpers ------------------------------
 function validUser({ name, email, password, password2 }) {
@@ -70,5 +75,6 @@ function cleanUser({ id, name, email }) {
 }
 
 module.exports = {
-  registerUser
+  registerUser,
+  loginUser
 }
