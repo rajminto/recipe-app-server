@@ -7,6 +7,10 @@ const morgan = require('morgan')
 const cors = require('cors')
 const bodyParser = require('body-parser')
 const session = require('express-session')
+const passport = require('passport')
+
+// Passport config
+require('./config/passport')(passport)
 
 // Middleware
 app.use(bodyParser.json())
@@ -22,6 +26,10 @@ app.use(session({
   saveUninitialized: true,
   // cookie: { secure: true }
 }))
+
+// Passport middleware
+app.use(passport.initialize())
+app.use(passport.session())
 
 // Routers
 const recipesRouter = require('./routes/recipes')
