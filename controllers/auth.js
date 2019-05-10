@@ -45,15 +45,35 @@ const loginUser = (req, res, next) => {
     'local', 
     (err, user, info) => {
       if (err) return next(err)
-      // Info object contains custom error message from local strategy config
+      // User not found: respond with custom error message from local strategy config (info object)
       if (!user) return res.status(400).json(info)
+      // User found: login and respond
       req.logIn(user, (err) => {
         if (err) return next(err)
-        return res.json({ message: 'You are now logged in!', user: user })
+        return res.json({
+          message: 'You are now logged in!',
+          user: {
+            id: user.id,
+            name: user.name,
+            email: user.email
+          }
+        })
       })
     })(req, res, next)
 }
 
+const testAuthentication = (req, res) => {
+  req.isAuthenticated()
+    ? res.json({
+      message: 'You are currently logged in!',
+      user: {
+        id: req.user.id,
+        name: req.user.name,
+        email: req.user.email
+      }
+    })
+    : res.status(401).json({ message: 'You are not logged in.' })
+}
 
 
 // ------------------------------ Validation Helpers ------------------------------
@@ -87,5 +107,6 @@ function cleanUser({ id, name, email }) {
 
 module.exports = {
   registerUser,
-  loginUser
+  loginUser,
+  testAuthentication
 }

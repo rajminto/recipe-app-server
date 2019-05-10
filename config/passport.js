@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt')
 // Sequelize models
 const User = require('../models').user
 
-module.exports = function(passport) {
+module.exports = (passport) => {
   passport.use(
     new LocalStrategy({ usernameField: 'email' }, (email, password, done) => {
       // Match user
