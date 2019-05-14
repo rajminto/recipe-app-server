@@ -34,7 +34,7 @@ const registerUser = (req, res, next) => {
         res.status(201).json({ success: true, message: 'You have successfully created an account!' })
       })
       .catch(err => {
-        if (err.message === 'existing user') res.status(409).json({ message: 'This email has already been registered. Please try again with a different email.' })
+        if (err.message === 'existing user') res.status(409).json({ success: false, message: 'This email has already been registered. Please try again with a different email.' })
         else next(err)
       })
   }
