@@ -1,3 +1,4 @@
+require('dotenv').config()
 const express = require('express')
 const app = express()
 const PORT = process.env.PORT || 3000
@@ -5,21 +6,41 @@ const PORT = process.env.PORT || 3000
 const morgan = require('morgan')
 const cors = require('cors')
 const bodyParser = require('body-parser')
+const session = require('express-session')
+const passport = require('passport')
+
+// Passport config
+require('./config/passport')(passport)
 
 // Middleware
 app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.urlencoded({ extended: true }))
 app.use(morgan(process.env.NODE_ENV !== 'production' ? 'dev' : 'combined'))
 app.use(cors({ origin: true, credentials: true }))
+
+// Express session middleware
+// TODO: Re-enable secure cookies in production
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave: true,
+  saveUninitialized: true,
+  // cookie: { secure: true }
+}))
+
+// Passport middleware
+app.use(passport.initialize())
+app.use(passport.session())
 
 // Routers
 const recipesRouter = require('./routes/recipes')
 const tagsRouter = require('./routes/tags')
+const authRouter = require('./routes/auth')
 
 // Routes
 app.get('/', (req, res) => res.json({ message: 'Server running!' }))
 app.use('/api/recipes', recipesRouter)
 app.use('/api/tags', tagsRouter)
+app.use('/api/auth', authRouter)
 
 // Error handling
 app.use(notFound)
