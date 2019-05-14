@@ -31,7 +31,7 @@ const registerUser = (req, res, next) => {
         return User.create(createUserObject(name, email, hash))
       })
       .then(newUser => {
-        res.status(201).json({ user: cleanUser(newUser) })
+        res.status(201).json({ success: true, message: 'You have successfully created an account!' })
       })
       .catch(err => {
         if (err.message === 'existing user') res.status(409).json({ message: 'This email has already been registered. Please try again with a different email.' })
