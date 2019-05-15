@@ -13,12 +13,12 @@ module.exports = (passport) => {
       })
         .then(async user => {
           // No user found: return with error message
-          if (!user) return done(null, false, { message: 'That email is not registered. Please try again.'})
+          if (!user) return done(null, false, { success: false, message: 'That email is not registered. Please try again.'})
           // User found: check for matching password
           const match = await bcrypt.compare(password, user.password)
           return match
             ? done(null, user)
-            : done(null, false, { message: 'Incorrect password. Please try again.' })
+            : done(null, false, { success: false, message: 'Incorrect password. Please try again.' })
         })
         // eslint-disable-next-line
         .catch(console.log)
