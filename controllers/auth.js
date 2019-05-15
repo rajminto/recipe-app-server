@@ -51,6 +51,7 @@ const loginUser = (req, res, next) => {
       req.logIn(user, (err) => {
         if (err) return next(err)
         return res.json({
+          success: true,
           message: 'You are now logged in!',
           user: {
             id: user.id,
