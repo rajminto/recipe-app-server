@@ -1,8 +1,25 @@
 // Sequelize models
-const User = require('../models').user
+const db = require('../models')
+const Recipe = db.recipe
+const User = db.user
+const Tag = db.tag
+
 
 const getUserRecipes = (req, res, next) => {
-  res.json({ id: req.params.id, message: 'hello from users'})
+  const userId = req.params.id
+  // Find all recipes the requested user has created OR saved
+  Recipe.findAll({
+    include: [
+      { model: User, attributes: ['id', 'name'], through: { where: { userId: userId }, attributes: ['createdBy'] } },
+      { model: Tag, attributes: ['id', 'name'], through: { attributes: [] } }
+    ],
+    order: [
+      ['id', 'ASC']
+    ]
+  })
+    .then(recipes => {
+      res.json({ recipes })
+    })
 }
 
 module.exports = {
