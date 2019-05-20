@@ -37,7 +37,11 @@ for (let i = 0; i < 100; i++) {
       { model: Ingredient },
       { model: Instruction }
     ]
-  }))
+  })
+    .then(newRecipe => {
+      newRecipe.addUser(faker.random.number({ min: 1, max: 2 }), { through: { createdBy: true } })
+    })
+  )
 }
 
 // console.log(recipes)
