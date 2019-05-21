@@ -4,8 +4,9 @@ const Recipe = db.recipe
 const Ingredient = db.ingredient
 const Instruction = db.instruction
 
-const recipes = []
+/* eslint-disable */
 
+const recipes = []
 console.log('Seeding recipes...')
 
 for (let i = 0; i < 30; i++) {
