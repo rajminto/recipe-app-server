@@ -24,7 +24,7 @@ const getUserRecipes = (req, res, next) => {
     .then(recipes => {
       recipes.length
         ? res.json({ recipes })
-        : res.status(404).json({ success: false, message: 'No recipes found for that user. Please try again.' })
+        : res.status(404).json({ success: false, message: 'No recipes found for that user. Please try again.', recipes: [] })
     })
     .catch(next)
 }
