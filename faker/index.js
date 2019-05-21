@@ -8,17 +8,15 @@ const recipes = []
 
 console.log('Seeding recipes...')
 
-for (let i = 0; i < 100; i++) {
+for (let i = 0; i < 30; i++) {
   const newRecipe = {
     name: faker.random.words(3),
     description: faker.lorem.paragraph(),
-    prep_time: `${faker.random.number()} seconds`,
-    cook_time: `${faker.random.number()} minutes`,
+    prep_time: `${faker.random.number({ min: 1, max: 120 })} minutes`,
+    cook_time: `${faker.random.number({ min: 1, max: 120 })} minutes`,
+    img_url: faker.image.image(),
     createdAt: new Date(),
     updatedAt: new Date(),
-    users: [
-      { id: faker.random.number({ min: 1, max: 2 }) }
-    ],
     ingredients: [
       { name: faker.random.word(), img_url: faker.image.imageUrl() },
       { name: faker.random.word(), img_url: faker.image.imageUrl() },
