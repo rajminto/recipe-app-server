@@ -35,12 +35,14 @@ app.use(passport.session())
 const recipesRouter = require('./routes/recipes')
 const tagsRouter = require('./routes/tags')
 const authRouter = require('./routes/auth')
+const usersRouter = require('./routes/users')
 
 // Routes
 app.get('/', (req, res) => res.json({ message: 'Server running!' }))
 app.use('/api/recipes', recipesRouter)
 app.use('/api/tags', tagsRouter)
 app.use('/api/auth', authRouter)
+app.use('/api/users', usersRouter)
 
 // Error handling
 app.use(notFound)
