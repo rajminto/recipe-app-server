@@ -49,6 +49,7 @@ const loginUser = (req, res, next) => {
       if (!user) return res.status(400).json(info)
       // User found: login and respond
       req.logIn(user, (err) => {
+        console.log(user)
         if (err) return next(err)
         return res.json({
           success: true,
@@ -56,7 +57,9 @@ const loginUser = (req, res, next) => {
           user: {
             id: user.id,
             name: user.name,
-            email: user.email
+            email: user.email,
+            avatar_url: user.avatar_url,
+            bio: user.bio
           }
         })
       })
