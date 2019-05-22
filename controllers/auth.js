@@ -49,7 +49,6 @@ const loginUser = (req, res, next) => {
       if (!user) return res.status(400).json(info)
       // User found: login and respond
       req.logIn(user, (err) => {
-        console.log(user)
         if (err) return next(err)
         return res.json({
           success: true,
