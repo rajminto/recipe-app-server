@@ -72,7 +72,9 @@ const testAuthentication = (req, res) => {
       user: {
         id: req.user.id,
         name: req.user.name,
-        email: req.user.email
+        email: req.user.email,
+        avatar_url: req.user.avatar_url,
+        bio: req.user.bio
       }
     })
     : res.status(401).json({ message: 'You are not logged in.' })
