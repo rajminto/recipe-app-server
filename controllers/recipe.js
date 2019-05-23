@@ -142,7 +142,7 @@ const searchRecipesByIngredient = (req, res, next) => {
 
 // ------------------------------ GET ALL Recipe Helpers ------------------------------
 
-function getAllRecipesPaginated(offset = 0, limit = 21) {
+function getAllRecipesPaginated(offset = 0, limit = 20) {
   return Recipe.findAll({
     include: [
       { model: User, attributes: ['id', 'name'], through: { where: { createdBy: true }, attributes: [] } },
