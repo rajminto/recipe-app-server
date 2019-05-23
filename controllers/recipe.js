@@ -12,11 +12,13 @@ const Tag         = db.tag
 
 const getAllRecipes = (req, res, next) => {
   // Pagination
-  const { start, count } = req.query
-  console.log('start', start)
-  console.log('count', count)
-  getAllRecipesPaginated()
-    .then(recipes => res.json({ recipes }))
+  const { offset, limit } = req.query
+  getAllRecipesPaginated(offset, limit)
+    .then(recipes => {
+      recipes.length
+        ? res.json({ success: true, recipes })
+        : res.status(404).json({ success: false, message: 'No recipes found.', recipes })
+    })
     .catch(next)
 }
 
@@ -140,7 +142,7 @@ const searchRecipesByIngredient = (req, res, next) => {
 
 // ------------------------------ GET ALL Recipe Helpers ------------------------------
 
-function getAllRecipesPaginated(start = 0, count = 30) {
+function getAllRecipesPaginated(offset = 0, limit = 21) {
   return Recipe.findAll({
     include: [
       { model: User, attributes: ['id', 'name'], through: { where: { createdBy: true }, attributes: [] } },
@@ -152,7 +154,9 @@ function getAllRecipesPaginated(start = 0, count = 30) {
       ['id', 'ASC'],
       [Instruction, 'order', 'ASC'],
       [Ingredient, 'id', 'ASC']
-    ]
+    ],
+    offset: offset,
+    limit: limit
   })
 }
 
