@@ -11,20 +11,14 @@ const Tag         = db.tag
 
 
 const getAllRecipes = (req, res, next) => {
-  Recipe.findAll({
-    include: [
-      { model: User, attributes: ['id', 'name'], through: { where: { createdBy: true }, attributes: [] } },
-      { model: Ingredient, attributes: ['id', 'name'] },
-      { model: Instruction, attributes: ['id', 'description', 'order'] },
-      { model: Tag, attributes: ['id', 'name'], through: { attributes: [] } }
-    ],
-    order: [
-      ['id', 'ASC'],
-      [Instruction, 'order', 'ASC'],
-      [Ingredient, 'id', 'ASC']
-    ]
-  })
-    .then(recipes => res.json({ recipes }))
+  // Pagination
+  const { offset, limit } = req.query
+  getAllRecipesPaginated(offset, limit)
+    .then(recipes => {
+      recipes.length
+        ? res.json({ success: true, recipes })
+        : res.status(404).json({ success: false, message: 'No recipes found.', recipes })
+    })
     .catch(next)
 }
 
@@ -144,6 +138,26 @@ const searchRecipesByIngredient = (req, res, next) => {
   })
     .then(recipes => res.json({ recipes }))
     .catch(next)
+}
+
+// ------------------------------ GET ALL Recipe Helpers ------------------------------
+
+function getAllRecipesPaginated(offset = 0, limit = 20) {
+  return Recipe.findAll({
+    include: [
+      { model: User, attributes: ['id', 'name'], through: { where: { createdBy: true }, attributes: [] } },
+      { model: Ingredient, attributes: ['id', 'name'] },
+      { model: Instruction, attributes: ['id', 'description', 'order'] },
+      { model: Tag, attributes: ['id', 'name'], through: { attributes: [] } }
+    ],
+    order: [
+      ['id', 'ASC'],
+      [Instruction, 'order', 'ASC'],
+      [Ingredient, 'id', 'ASC']
+    ],
+    offset: offset,
+    limit: limit
+  })
 }
 
 // ------------------------------ Create Recipe Helpers ------------------------------
