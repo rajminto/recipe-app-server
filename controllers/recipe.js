@@ -12,7 +12,7 @@ const Tag         = db.tag
 
 const getAllRecipes = (req, res, next) => {
   const { offset, limit, type, query } = req.query
-  
+
   if (type === 'ingredient') {
     getRecipesByIngredient(offset, limit, query)
       .then(recipes => {
@@ -175,7 +175,7 @@ function getRecipesByIngredient(offset = 0, limit = 20, ingredient) {
 
   return Recipe.findAll({
     include: [
-      // { model: User, attributes: ['id', 'name'] },
+      { model: Tag, attributes: ['id', 'name'] },
       {
         model: Ingredient,
         attributes: ['id', 'name'],
