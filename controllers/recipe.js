@@ -11,8 +11,8 @@ const Tag         = db.tag
 
 
 const getAllRecipes = (req, res, next) => {
-  // Pagination
   const { offset, limit, type, query } = req.query
+  
   if (type === 'ingredient') {
     getRecipesByIngredient(offset, limit, query)
       .then(recipes => {
@@ -185,7 +185,9 @@ function getRecipesByIngredient(offset = 0, limit = 20, ingredient) {
     order: [
       ['id', 'ASC'],
       [Ingredient, 'id', 'ASC']
-    ]
+    ],
+    offset: offset,
+    limit: limit
   })
 }
 
