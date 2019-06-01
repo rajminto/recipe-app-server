@@ -11,15 +11,25 @@ const Tag         = db.tag
 
 
 const getAllRecipes = (req, res, next) => {
-  // Pagination
-  const { offset, limit } = req.query
-  getAllRecipesPaginated(offset, limit)
-    .then(recipes => {
-      recipes.length
-        ? res.json({ success: true, recipes })
-        : res.status(404).json({ success: false, message: 'No recipes found.', recipes })
-    })
-    .catch(next)
+  const { offset, limit, type, query } = req.query
+
+  if (type === 'ingredient') {
+    getRecipesByIngredient(offset, limit, query)
+      .then(recipes => {
+        recipes.length
+          ? res.json({ success: true, recipes })
+          : res.status(404).json({ success: false, message: 'No recipes found.', recipes })
+      })
+      .catch(next)
+  } else {
+    getAllRecipesPaginated(offset, limit)
+      .then(recipes => {
+        recipes.length
+          ? res.json({ success: true, recipes })
+          : res.status(404).json({ success: false, message: 'No recipes found.', recipes })
+      })
+      .catch(next)
+  }
 }
 
 const getRecipeById = (req, res, next) => {
@@ -124,10 +134,10 @@ const searchRecipesByIngredient = (req, res, next) => {
 
   Recipe.findAll({
     include: [
-      { model: User, attributes: ['name'] },
+      { model: User, attributes: ['id', 'name'] },
       {
         model: Ingredient,
-        attributes: ['id', 'name', 'quantity'], 
+        attributes: ['id', 'name'], 
         where: { name: { [Op.iLike]: `%${ingredient}%` } }
       },
     ],
@@ -153,6 +163,27 @@ function getAllRecipesPaginated(offset = 0, limit = 20) {
     order: [
       ['id', 'ASC'],
       [Instruction, 'order', 'ASC'],
+      [Ingredient, 'id', 'ASC']
+    ],
+    offset: offset,
+    limit: limit
+  })
+}
+
+function getRecipesByIngredient(offset = 0, limit = 20, ingredient) {
+  const Op = db.Sequelize.Op
+
+  return Recipe.findAll({
+    include: [
+      { model: Tag, attributes: ['id', 'name'] },
+      {
+        model: Ingredient,
+        attributes: ['id', 'name'],
+        where: { name: { [Op.iLike]: `%${ingredient}%` } }
+      },
+    ],
+    order: [
+      ['id', 'ASC'],
       [Ingredient, 'id', 'ASC']
     ],
     offset: offset,
