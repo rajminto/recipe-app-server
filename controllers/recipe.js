@@ -193,10 +193,11 @@ function getRecipesByIngredient(offset = 0, limit = 20, ingredient) {
 
 // ------------------------------ Create Recipe Helpers ------------------------------
 
-function createRecipeObject({ name, description, prep_time, cook_time, ingredients, instructions, tags }) {
+function createRecipeObject({ name, description, img_url, prep_time, cook_time, ingredients, instructions, tags }) {
   return {
     name,
     description,
+    img_url,
     prep_time,
     cook_time,
     ingredients,
