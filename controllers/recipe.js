@@ -79,7 +79,7 @@ const createRecipe = (req, res, next) => {
     })
       .then(newRecipe => {
         // All requests succeeded: transaction committed
-        res.status(201).json({ message: 'Created new recipe.', recipe: newRecipe })
+        res.status(201).json({ success: true, message: 'Created new recipe.', recipe: newRecipe })
       })
       .catch(next)
       // At least one request failed: transaction rolled back
