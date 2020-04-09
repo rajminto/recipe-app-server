@@ -1,5 +1,9 @@
 // Validation helpers
-const { validRecipe, validIngredients, validInstructions } = require('../lib/validation/recipe')
+const {
+  validRecipe,
+  validIngredients,
+  validInstructions
+} = require('../lib/validation/recipe')
 
 // Sequelize models
 const db          = require('../models')
