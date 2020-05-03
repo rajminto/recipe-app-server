@@ -1,5 +1,9 @@
 // Validation helpers
-const { validRecipe, validIngredients, validInstructions } = require('../lib/validation/recipe')
+const {
+  validRecipe,
+  validIngredients,
+  validInstructions
+} = require('../lib/validation/recipe')
 
 // Sequelize models
 const db          = require('../models')
@@ -56,10 +60,12 @@ const getRecipeById = (req, res, next) => {
 
 const createRecipe = (req, res, next) => {
   const recipe = req.body
+  const { id: userId } = req.user
+  
   // Validate recipe
-  if (!validRecipe(recipe))                         res.status(400).json({ message: 'Please enter a name, description, prep time, and cook time.' })
-  else if (!validIngredients(recipe.ingredients))   res.status(400).json({ message: 'Please enter at least one ingredient with a name and quantity.' })
-  else if (!validInstructions(recipe.instructions)) res.status(400).json({ message: 'Please enter at least one instruction with a description.' })
+  if (!validRecipe(recipe))                         res.status(400).json({ success: false, message: 'Please enter a name, description, prep time, and cook time.' })
+  else if (!validIngredients(recipe.ingredients))   res.status(400).json({ success: false, message: 'Please enter at least one ingredient with a name and quantity.' })
+  else if (!validInstructions(recipe.instructions)) res.status(400).json({ success: false, message: 'Please enter at least one instruction with a description.' })
   else {
     // Create recipe once passed validation
     db.sequelize.transaction(async t => {
@@ -68,16 +74,16 @@ const createRecipe = (req, res, next) => {
         include: [
           { model: Ingredient },
           { model: Instruction },
-          { model: Tag }
+          // { model: Tag }
         ],
         transaction: t
       })
-      await newRecipe.addUser(recipe.userId, { through: { createdBy: true }, transaction: t })
+      await newRecipe.addUser(userId, { through: { createdBy: true }, transaction: t })
       return newRecipe
     })
       .then(newRecipe => {
         // All requests succeeded: transaction committed
-        res.status(201).json({ message: 'Created new recipe.', recipe: newRecipe })
+        res.status(201).json({ success: true, message: 'Created new recipe.', recipe: newRecipe })
       })
       .catch(next)
       // At least one request failed: transaction rolled back
@@ -193,13 +199,24 @@ function getRecipesByIngredient(offset = 0, limit = 20, ingredient) {
 
 // ------------------------------ Create Recipe Helpers ------------------------------
 
-function createRecipeObject({ name, description, img_url, prep_time, cook_time, ingredients, instructions, tags }) {
+function createRecipeObject({
+  name,
+  description,
+  img_url,
+  prep_time,
+  cook_time,
+  isPrivate,
+  ingredients,
+  instructions,
+  tags
+}) {
   return {
     name,
     description,
     img_url,
     prep_time,
     cook_time,
+    isPrivate,
     ingredients,
     instructions,
     tags

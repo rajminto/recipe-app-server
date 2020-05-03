@@ -5,7 +5,8 @@ module.exports = (sequelize, DataTypes) => {
     description: DataTypes.TEXT,
     img_url: DataTypes.STRING,
     prep_time: DataTypes.STRING,
-    cook_time: DataTypes.STRING
+    cook_time: DataTypes.STRING,
+    isPrivate: DataTypes.BOOLEAN
   }, {})
   recipe.associate = function(models) {
     // associations can be defined here
