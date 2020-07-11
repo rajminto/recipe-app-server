@@ -27,8 +27,7 @@ const getAllRecipes = (req, res, next) => {
       })
       .catch(next)
   } else {
-    // Recipe.methodTest()
-    Recipe.getAllRecipesPaginated(offset, limit)
+    Recipe.findAllRecipesPaginated(offset, limit)
       .then((recipes) => {
         recipes.length
           ? res.json({ success: true, recipes })
@@ -41,6 +40,7 @@ const getAllRecipes = (req, res, next) => {
 }
 
 const getRecipeById = (req, res, next) => {
+  // TODO: Refactor into models/recipe.js
   Recipe.findByPk(req.params.id, {
     include: [
       {
@@ -72,7 +72,7 @@ const getRecipeById = (req, res, next) => {
 const createRecipe = (req, res, next) => {
   const recipe = req.body
   const { id: userId } = req.user
-
+  // TODO: Refactor into models/recipe.js
   // Validate recipe
   if (!validRecipe(recipe))
     res.status(400).json({
@@ -141,6 +141,7 @@ const updateRecipeById = (req, res, next) => {
   const { ingredients, instructions, tags } = req.body
   const recipeId = req.params.id
 
+  // TODO: Refactor into models/recipe.js
   // Initialize sequelize transaction to execute multiple queries as atomic operation
   db.sequelize
     .transaction((t) => {
@@ -181,6 +182,7 @@ const searchRecipesByIngredient = (req, res, next) => {
   const ingredient = req.query.ingredient
   const Op = db.Sequelize.Op
 
+  // TODO: Refactor into models/recipe.js
   Recipe.findAll({
     include: [
       { model: User, attributes: ['id', 'name'] },
@@ -201,28 +203,7 @@ const searchRecipesByIngredient = (req, res, next) => {
 
 // ------------------------------ GET ALL Recipe Helpers ------------------------------
 
-function getAllRecipesPaginated(offset = 0, limit = 20) {
-  return Recipe.findAll({
-    include: [
-      {
-        model: User,
-        attributes: ['id', 'name'],
-        through: { where: { createdBy: true }, attributes: [] },
-      },
-      { model: Ingredient, attributes: ['id', 'name'] },
-      { model: Instruction, attributes: ['id', 'description', 'order'] },
-      { model: Tag, attributes: ['id', 'name'], through: { attributes: [] } },
-    ],
-    order: [
-      ['id', 'ASC'],
-      [Instruction, 'order', 'ASC'],
-      [Ingredient, 'id', 'ASC'],
-    ],
-    offset: offset,
-    limit: limit,
-  })
-}
-
+// TODO: Refactor into models/recipe.js
 function getRecipesByIngredient(offset = 0, limit = 20, ingredient) {
   const Op = db.Sequelize.Op
 

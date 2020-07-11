@@ -33,13 +33,13 @@ module.exports = (sequelize, DataTypes) => {
   }
 
   // class method assignment
-  recipe.getAllRecipesPaginated = getAllRecipesPaginated
+  recipe.findAllRecipesPaginated = findAllRecipesPaginated
 
   return recipe
 }
 
-// model class methods
-function getAllRecipesPaginated(offset = 0, limit = 20) {
+// recipe model class methods
+function findAllRecipesPaginated(offset = 0, limit = 20) {
   return this.findAll({
     include: [
       {
