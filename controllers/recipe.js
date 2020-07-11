@@ -27,7 +27,8 @@ const getAllRecipes = (req, res, next) => {
       })
       .catch(next)
   } else {
-    getAllRecipesPaginated(offset, limit)
+    // Recipe.methodTest()
+    Recipe.getAllRecipesPaginated(offset, limit)
       .then((recipes) => {
         recipes.length
           ? res.json({ success: true, recipes })
