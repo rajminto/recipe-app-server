@@ -25,27 +25,38 @@ for (let i = 0; i < 30; i++) {
       { name: faker.random.word(), img_url: faker.image.imageUrl() },
     ],
     instructions: [
-      { description: faker.lorem.paragraph(), order: faker.random.number({ min: 1, max: 4 }) },
-      { description: faker.lorem.paragraph(), order: faker.random.number({ min: 1, max: 4 }) },
-      { description: faker.lorem.paragraph(), order: faker.random.number({ min: 1, max: 4 }) },
-      { description: faker.lorem.paragraph(), order: faker.random.number({ min: 1, max: 4 }) },
-    ]
+      {
+        description: faker.lorem.paragraph(),
+        order: faker.random.number({ min: 1, max: 4 }),
+      },
+      {
+        description: faker.lorem.paragraph(),
+        order: faker.random.number({ min: 1, max: 4 }),
+      },
+      {
+        description: faker.lorem.paragraph(),
+        order: faker.random.number({ min: 1, max: 4 }),
+      },
+      {
+        description: faker.lorem.paragraph(),
+        order: faker.random.number({ min: 1, max: 4 }),
+      },
+    ],
   }
-  recipes.push(Recipe.create(newRecipe, {
-    include: [
-      { model: Ingredient },
-      { model: Instruction }
-    ]
-  })
-    .then(newRecipe => {
-      newRecipe.addUser(faker.random.number({ min: 1, max: 2 }), { through: { createdBy: true } })
+  recipes.push(
+    Recipe.create(newRecipe, {
+      include: [{ model: Ingredient }, { model: Instruction }],
+    }).then((newRecipe) => {
+      newRecipe.addUser(faker.random.number({ min: 1, max: 2 }), {
+        through: { createdBy: true },
+      })
     })
   )
 }
 
 // console.log(recipes)
 Promise.all(recipes)
-  .then(records => {
+  .then((records) => {
     console.log('Seeding complete!')
   })
   .catch(console.log)
