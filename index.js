@@ -20,12 +20,14 @@ app.use(cors({ origin: true, credentials: true }))
 
 // Express session middleware
 // TODO: Re-enable secure cookies in production
-app.use(session({
-  secret: process.env.SESSION_SECRET,
-  resave: true,
-  saveUninitialized: true,
-  // cookie: { secure: true }
-}))
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: true,
+    saveUninitialized: true,
+    // cookie: { secure: true }
+  })
+)
 
 // Passport middleware
 app.use(passport.initialize())
@@ -50,7 +52,9 @@ app.use(errorHandler)
 
 // eslint-disable-next-line
 function notFound(req, res, next) {
-  res.status(404).send({ error: 'Not found!', status: 404, url: req.originalUrl })
+  res
+    .status(404)
+    .send({ error: 'Not found!', status: 404, url: req.originalUrl })
 }
 
 // eslint-disable-next-line
@@ -63,4 +67,3 @@ function errorHandler(err, req, res, next) {
 
 // eslint-disable-next-line
 app.listen(PORT, () => console.log(`Server listening on port: ${PORT}`))
-
