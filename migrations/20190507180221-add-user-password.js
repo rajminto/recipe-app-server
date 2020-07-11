@@ -9,11 +9,10 @@ module.exports = {
       Example:
       return queryInterface.createTable('users', { id: Sequelize.INTEGER })
     */
-    return queryInterface.addColumn(
-      'users',
-      'password',
-      { type: Sequelize.STRING, allowNull: false }
-    )
+    return queryInterface.addColumn('users', 'password', {
+      type: Sequelize.STRING,
+      allowNull: false,
+    })
   },
 
   // eslint-disable-next-line
@@ -26,5 +25,5 @@ module.exports = {
       return queryInterface.dropTable('users')
     */
     return queryInterface.removeColumn('users', 'password')
-  }
+  },
 }

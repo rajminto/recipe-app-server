@@ -9,11 +9,10 @@ module.exports = {
       Example:
       return queryInterface.createTable('users', { id: Sequelize.INTEGER });
     */
-    return queryInterface.addColumn(
-      'recipes',
-      'isPrivate',
-      { type: Sequelize.BOOLEAN, defaultValue: false }
-    )
+    return queryInterface.addColumn('recipes', 'isPrivate', {
+      type: Sequelize.BOOLEAN,
+      defaultValue: false,
+    })
   },
   // eslint-disable-next-line
   down: (queryInterface, Sequelize) => {
@@ -25,5 +24,5 @@ module.exports = {
       return queryInterface.dropTable('users');
     */
     return queryInterface.removeColumn('recipes', 'isPrivate')
-  }
+  },
 }

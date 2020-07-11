@@ -4,20 +4,24 @@ const passport = require('passport')
 // Sequelize models
 const User = require('../models').user
 
-
 const registerUser = (req, res, next) => {
   const { name, email, password, password2 } = req.body
-  
+
   // Validate user
   // TODO: improve validation
-  if      (!validUser(req.body))                    res.status(400).json({ message: 'Please enter a username, email, and a password longer than 5 characters.' })
-  else if (!matchingPasswords(password, password2)) res.status(400).json({ message: 'Please enter matching passwords.' })
+  if (!validUser(req.body))
+    res.status(400).json({
+      message:
+        'Please enter a username, email, and a password longer than 5 characters.',
+    })
+  else if (!matchingPasswords(password, password2))
+    res.status(400).json({ message: 'Please enter matching passwords.' })
   else {
     // Validation passed: check if user already exists in db
     User.findOne({
-      where: { email: email }
+      where: { email: email },
     })
-      .then(user => {
+      .then((user) => {
         // User already exists: throw error and respond in .catch
         if (user) throw new Error('existing user')
         else {
@@ -26,60 +30,65 @@ const registerUser = (req, res, next) => {
           return bcrypt.hash(password, saltRounds)
         }
       })
-      .then(hash => {
+      .then((hash) => {
         // Create new user with hashed password
         return User.create(createUserObject(name, email, hash))
       })
-      .then(newUser => {
-        res.status(201).json({ success: true, message: 'You have successfully created an account!' })
+      .then((newUser) => {
+        res.status(201).json({
+          success: true,
+          message: 'You have successfully created an account!',
+        })
       })
-      .catch(err => {
-        if (err.message === 'existing user') res.status(409).json({ success: false, message: 'This email has already been registered. Please try again with a different email.' })
+      .catch((err) => {
+        if (err.message === 'existing user')
+          res.status(409).json({
+            success: false,
+            message:
+              'This email has already been registered. Please try again with a different email.',
+          })
         else next(err)
       })
   }
 }
 
 const loginUser = (req, res, next) => {
-  passport.authenticate(
-    'local', 
-    (err, user, info) => {
+  passport.authenticate('local', (err, user, info) => {
+    if (err) return next(err)
+    // User not found: respond with custom error message from local strategy config (info object)
+    if (!user) return res.status(400).json(info)
+    // User found: login and respond
+    req.logIn(user, (err) => {
       if (err) return next(err)
-      // User not found: respond with custom error message from local strategy config (info object)
-      if (!user) return res.status(400).json(info)
-      // User found: login and respond
-      req.logIn(user, (err) => {
-        if (err) return next(err)
-        return res.json({
-          success: true,
-          message: 'You are now logged in!',
-          user: {
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            avatar_url: user.avatar_url,
-            bio: user.bio
-          }
-        })
+      return res.json({
+        success: true,
+        message: 'You are now logged in!',
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          avatar_url: user.avatar_url,
+          bio: user.bio,
+        },
       })
-    })(req, res, next)
+    })
+  })(req, res, next)
 }
 
 const testAuthentication = (req, res) => {
   req.isAuthenticated()
     ? res.json({
-      message: 'You are currently logged in!',
-      user: {
-        id: req.user.id,
-        name: req.user.name,
-        email: req.user.email,
-        avatar_url: req.user.avatar_url,
-        bio: req.user.bio
-      }
-    })
+        message: 'You are currently logged in!',
+        user: {
+          id: req.user.id,
+          name: req.user.name,
+          email: req.user.email,
+          avatar_url: req.user.avatar_url,
+          bio: req.user.bio,
+        },
+      })
     : res.status(401).json({ message: 'You are not logged in.' })
 }
-
 
 // ------------------------------ Validation Helpers ------------------------------
 function validUser({ name, email, password, password2 }) {
@@ -89,7 +98,9 @@ function validUser({ name, email, password, password2 }) {
   const validPassword = typeof password === 'string' && password.length > 5
   const validPassword2 = typeof password2 === 'string' && password2.length > 5
 
-  return fieldsPresent && validName && validEmail && validPassword && validPassword2
+  return (
+    fieldsPresent && validName && validEmail && validPassword && validPassword2
+  )
 }
 
 function matchingPasswords(password1, password2) {
@@ -102,7 +113,7 @@ function createUserObject(name, email, hash) {
   return {
     name: name,
     email: email,
-    password: hash
+    password: hash,
   }
 }
 
@@ -113,5 +124,5 @@ function cleanUser({ id, name, email }) {
 module.exports = {
   registerUser,
   loginUser,
-  testAuthentication
+  testAuthentication,
 }

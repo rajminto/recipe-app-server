@@ -19,15 +19,15 @@ module.exports = {
         userId: 1,
         createdBy: true,
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       },
       {
         recipeId: 1,
         userId: 2,
         createdBy: false,
         createdAt: new Date(),
-        updatedAt: new Date()
-      }
+        updatedAt: new Date(),
+      },
     ])
   },
   // eslint-disable-next-line
@@ -40,5 +40,5 @@ module.exports = {
       return queryInterface.bulkDelete('People', null, {})
     */
     return queryInterface.bulkDelete('useRecipes', null, {})
-  }
+  },
 }

@@ -21,6 +21,8 @@ module.exports = {
       Example:
       return queryInterface.dropTable('users');
     */
-    return queryInterface.addColumn('ingredients', 'quantity', { type: Sequelize.INTEGER })
-  }
+    return queryInterface.addColumn('ingredients', 'quantity', {
+      type: Sequelize.INTEGER,
+    })
+  },
 }
