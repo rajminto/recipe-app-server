@@ -32,6 +32,10 @@ module.exports = {
           as: 'userId',
         },
       },
+      isPrivate: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

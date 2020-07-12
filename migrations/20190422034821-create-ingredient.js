@@ -11,9 +11,6 @@ module.exports = {
       name: {
         type: Sequelize.STRING,
       },
-      quantity: {
-        type: Sequelize.INTEGER,
-      },
       recipeId: {
         type: Sequelize.INTEGER,
         onDelete: 'CASCADE',
