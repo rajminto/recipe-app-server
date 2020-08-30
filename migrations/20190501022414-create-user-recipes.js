@@ -6,7 +6,7 @@ module.exports = {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
       },
       userId: {
         type: Sequelize.INTEGER,
@@ -16,8 +16,8 @@ module.exports = {
         references: {
           model: 'users',
           key: 'id',
-          as: 'userId'
-        }
+          as: 'userId',
+        },
       },
       recipeId: {
         type: Sequelize.INTEGER,
@@ -27,24 +27,24 @@ module.exports = {
         references: {
           model: 'recipes',
           key: 'id',
-          as: 'recipeId'
-        }
+          as: 'recipeId',
+        },
       },
       createdBy: {
-        type: Sequelize.BOOLEAN
+        type: Sequelize.BOOLEAN,
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
-      }
+        type: Sequelize.DATE,
+      },
     })
   },
   // eslint-disable-next-line
   down: (queryInterface, Sequelize) => {
     return queryInterface.dropTable('userRecipes')
-  }
+  },
 }
