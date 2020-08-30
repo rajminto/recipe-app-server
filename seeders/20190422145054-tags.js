@@ -46,6 +46,12 @@ module.exports = {
           createdAt: new Date(),
           updatedAt: new Date(),
         },
+        {
+          name: 'contains-gluten',
+          img_url: 'https://placehold.it/200x200',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
       ],
       {}
     )
