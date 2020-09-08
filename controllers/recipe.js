@@ -141,7 +141,30 @@ const deleteRecipeById = (req, res, next) => {
     .catch(next)
 }
 
+// --------------------------------------------------------
+
 const updateRecipeById = (req, res, next) => {
+  const { tags } = req.body
+  const { id: recipeId } = req.params
+
+  db.sequelize
+    .transaction(async (t) => {
+      const recipeToUpdate = await Recipe.findByPk(recipeId, { transaction: t })
+
+      // update tag associations (replacing previous)
+      const updatedRecipe = recipeToUpdate.setTags([1], {
+        transaction: t,
+      })
+      return updatedRecipe
+    })
+    .then((something) => {
+      res.json({ something })
+    })
+}
+
+// --------------------------------------------------------
+
+const updateRecipeByIdOld = (req, res, next) => {
   // TODO: add validation
   const { ingredients, instructions, tags } = req.body
   const recipeId = req.params.id
