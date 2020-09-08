@@ -99,7 +99,7 @@ const createRecipe = (req, res, next) => {
           transaction: t,
         })
 
-        // associate created recipe with logged in user
+        // associate created recipe with logged in user as creator
         await newRecipe.addUser(userId, {
           through: { createdBy: true },
           transaction: t,
@@ -144,14 +144,27 @@ const deleteRecipeById = (req, res, next) => {
 // --------------------------------------------------------
 
 const updateRecipeById = async (req, res, next) => {
-  const { tags } = req.body
+  const { ingredients, tags } = req.body
   const { id: recipeId } = req.params
 
   try {
     const result = await db.sequelize.transaction(async (t) => {
-      let recipe = await Recipe.findByPk(recipeId, {
-        transaction: t,
+      const recipe = await Recipe.findByPk(recipeId, { transaction: t })
+
+      // update basic recipe info
+      await recipe.update(req.body, { transaction: t })
+
+      // reset recipe ingredient associations
+      await recipe.setIngredients([])
+
+      // associate new ingredients with recipe
+      const newIngredients = ingredients.map((ingredient) => {
+        ingredient.recipeId = recipeId
+        return ingredient
       })
+
+      // create new ingredients
+      await Ingredient.bulkCreate(newIngredients)
 
       // update tag associations (replacing previous)
       const tagIds = mapTagNamesIntoIds(tags)
@@ -161,12 +174,15 @@ const updateRecipeById = async (req, res, next) => {
 
       return recipe
     })
+
     // transaction succeeded, respond to client
-    res
-      .status(200)
-      .json({ success: true, message: 'Recipe updated successfully!', result })
+    res.status(200).json({
+      success: true,
+      message: 'Recipe updated successfully!',
+      result,
+    })
   } catch (err) {
-    // at least one request failed, transaction rolled back, pass to error handler
+    // at least one request failed, transaction rolled back
     next(err)
   }
 }
@@ -309,15 +325,6 @@ function mapTagNamesIntoIds(tagNames) {
         break
       case 'contains-gluten':
         tagId = 6
-        break
-      case 'contains-poultry':
-        tagId = 7
-        break
-      case 'contains-fish':
-        tagId = 8
-        break
-      case 'contains-dairy':
-        tagId = 9
         break
       default:
         break
