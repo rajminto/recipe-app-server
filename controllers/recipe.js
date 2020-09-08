@@ -143,23 +143,32 @@ const deleteRecipeById = (req, res, next) => {
 
 // --------------------------------------------------------
 
-const updateRecipeById = (req, res, next) => {
+const updateRecipeById = async (req, res, next) => {
   const { tags } = req.body
   const { id: recipeId } = req.params
 
-  db.sequelize
-    .transaction(async (t) => {
-      const recipeToUpdate = await Recipe.findByPk(recipeId, { transaction: t })
-
-      // update tag associations (replacing previous)
-      const updatedRecipe = recipeToUpdate.setTags([1], {
+  try {
+    const result = await db.sequelize.transaction(async (t) => {
+      let recipe = await Recipe.findByPk(recipeId, {
         transaction: t,
       })
-      return updatedRecipe
+
+      // update tag associations (replacing previous)
+      const tagIds = mapTagNamesIntoIds(tags)
+      await recipe.setTags(tagIds, {
+        transaction: t,
+      })
+
+      return recipe
     })
-    .then((something) => {
-      res.json({ something })
-    })
+    // transaction succeeded, respond to client
+    res
+      .status(200)
+      .json({ success: true, message: 'Recipe updated successfully!', result })
+  } catch (err) {
+    // at least one request failed, transaction rolled back, pass to error handler
+    next(err)
+  }
 }
 
 // --------------------------------------------------------
