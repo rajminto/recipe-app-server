@@ -106,7 +106,8 @@ const createRecipe = (req, res, next) => {
         })
 
         // associate created recipe with correct tags (cannot be done with .create using sequelize)
-        await newRecipe.addTags([1, 2], {
+        const tagIds = mapTagNamesIntoIds(recipe.tags)
+        await newRecipe.addTags(tagIds, {
           transaction: t,
         })
 
@@ -253,6 +254,45 @@ function createRecipeObject({
     instructions,
     tags,
   }
+}
+
+function mapTagNamesIntoIds(tagNames) {
+  return tagNames.map((tag) => {
+    let tagId
+    switch (tag) {
+      case 'contains-poultry':
+        tagId = 1
+        break
+      case 'contains-fish':
+        tagId = 2
+        break
+      case 'contains-dairy':
+        tagId = 3
+        break
+      case 'contains-meat':
+        tagId = 4
+        break
+      case 'vegetarian':
+        tagId = 5
+        break
+      case 'contains-gluten':
+        tagId = 6
+        break
+      case 'contains-poultry':
+        tagId = 7
+        break
+      case 'contains-fish':
+        tagId = 8
+        break
+      case 'contains-dairy':
+        tagId = 9
+        break
+      default:
+        break
+    }
+
+    return tagId
+  })
 }
 
 // ------------------------------ Update Recipe Helpers ------------------------------
