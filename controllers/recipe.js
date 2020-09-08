@@ -95,17 +95,21 @@ const createRecipe = (req, res, next) => {
       .transaction(async (t) => {
         // Using async/await so that newRecipe can be returned on success
         const newRecipe = await Recipe.create(createRecipeObject(recipe), {
-          include: [
-            { model: Ingredient },
-            { model: Instruction },
-            // { model: Tag }
-          ],
+          include: [{ model: Ingredient }, { model: Instruction }],
           transaction: t,
         })
+
+        // associate created recipe with logged in user
         await newRecipe.addUser(userId, {
           through: { createdBy: true },
           transaction: t,
         })
+
+        // associate created recipe with correct tags (cannot be done with .create using sequelize)
+        await newRecipe.addTags([1, 2], {
+          transaction: t,
+        })
+
         return newRecipe
       })
       .then((newRecipe) => {
