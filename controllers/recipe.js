@@ -144,7 +144,7 @@ const deleteRecipeById = (req, res, next) => {
 // --------------------------------------------------------
 
 const updateRecipeById = async (req, res, next) => {
-  const { ingredients, tags } = req.body
+  const { ingredients, instructions, tags } = req.body
   const { id: recipeId } = req.params
 
   try {
@@ -165,6 +165,18 @@ const updateRecipeById = async (req, res, next) => {
 
       // create new ingredients
       await Ingredient.bulkCreate(newIngredients, { transaction: t })
+
+      // reset recipe instruction associations
+      await recipe.setInstructions([])
+
+      // associate new instructions wth recipe
+      const newInstructions = instructions.map((instruction) => {
+        instruction.recipeId = recipeId
+        return instruction
+      })
+
+      // create new instructions
+      await Instruction.bulkCreate(newInstructions, { transaction: t })
 
       // update tag associations (replacing previous)
       const tagIds = mapTagNamesIntoIds(tags)
