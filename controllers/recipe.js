@@ -155,7 +155,7 @@ const updateRecipeById = async (req, res, next) => {
       await recipe.update(req.body, { transaction: t })
 
       // reset recipe ingredient associations
-      await recipe.setIngredients([])
+      await recipe.setIngredients([], { transaction: t })
 
       // associate new ingredients with recipe
       const newIngredients = ingredients.map((ingredient) => {
@@ -164,13 +164,11 @@ const updateRecipeById = async (req, res, next) => {
       })
 
       // create new ingredients
-      await Ingredient.bulkCreate(newIngredients)
+      await Ingredient.bulkCreate(newIngredients, { transaction: t })
 
       // update tag associations (replacing previous)
       const tagIds = mapTagNamesIntoIds(tags)
-      await recipe.setTags(tagIds, {
-        transaction: t,
-      })
+      await recipe.setTags(tagIds, { transaction: t })
 
       return recipe
     })
