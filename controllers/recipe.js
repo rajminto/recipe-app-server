@@ -95,17 +95,22 @@ const createRecipe = (req, res, next) => {
       .transaction(async (t) => {
         // Using async/await so that newRecipe can be returned on success
         const newRecipe = await Recipe.create(createRecipeObject(recipe), {
-          include: [
-            { model: Ingredient },
-            { model: Instruction },
-            // { model: Tag }
-          ],
+          include: [{ model: Ingredient }, { model: Instruction }],
           transaction: t,
         })
+
+        // associate created recipe with logged in user
         await newRecipe.addUser(userId, {
           through: { createdBy: true },
           transaction: t,
         })
+
+        // associate created recipe with correct tags (cannot be done with .create using sequelize)
+        const tagIds = mapTagNamesIntoIds(recipe.tags)
+        await newRecipe.addTags(tagIds, {
+          transaction: t,
+        })
+
         return newRecipe
       })
       .then((newRecipe) => {
@@ -249,6 +254,45 @@ function createRecipeObject({
     instructions,
     tags,
   }
+}
+
+function mapTagNamesIntoIds(tagNames) {
+  return tagNames.map((tag) => {
+    let tagId
+    switch (tag) {
+      case 'contains-poultry':
+        tagId = 1
+        break
+      case 'contains-fish':
+        tagId = 2
+        break
+      case 'contains-dairy':
+        tagId = 3
+        break
+      case 'contains-meat':
+        tagId = 4
+        break
+      case 'vegetarian':
+        tagId = 5
+        break
+      case 'contains-gluten':
+        tagId = 6
+        break
+      case 'contains-poultry':
+        tagId = 7
+        break
+      case 'contains-fish':
+        tagId = 8
+        break
+      case 'contains-dairy':
+        tagId = 9
+        break
+      default:
+        break
+    }
+
+    return tagId
+  })
 }
 
 // ------------------------------ Update Recipe Helpers ------------------------------
