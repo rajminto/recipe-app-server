@@ -6,6 +6,7 @@ module.exports = (sequelize, DataTypes) => {
       userId: DataTypes.INTEGER,
       recipeId: DataTypes.INTEGER,
       createdBy: DataTypes.INTEGER,
+      isFavorite: DataTypes.BOOLEAN,
     },
     {}
   )

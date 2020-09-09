@@ -46,7 +46,10 @@ const getRecipeById = (req, res, next) => {
       {
         model: User,
         attributes: ['id', 'name'],
-        through: { where: { createdBy: true }, attributes: [] },
+        through: {
+          where: { createdBy: true },
+          attributes: ['createdBy', 'isFavorite'],
+        },
       },
       { model: Ingredient, attributes: ['id', 'name'] },
       { model: Instruction, attributes: ['id', 'description', 'order'] },
