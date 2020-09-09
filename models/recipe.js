@@ -48,7 +48,7 @@ function findAllRecipesPaginated(offset = 0, limit = 20) {
         attributes: ['id', 'name'],
         through: {
           where: { createdBy: true },
-          attributes: ['createdBy', 'isFavorite'],
+          attributes: ['id', 'createdBy', 'isFavorite'],
         },
       },
       { model: this.sequelize.models.ingredient, attributes: ['id', 'name'] },

@@ -48,7 +48,7 @@ const getRecipeById = (req, res, next) => {
         attributes: ['id', 'name'],
         through: {
           where: { createdBy: true },
-          attributes: ['createdBy', 'isFavorite'],
+          attributes: ['id', 'createdBy', 'isFavorite'],
         },
       },
       { model: Ingredient, attributes: ['id', 'name'] },
@@ -194,6 +194,77 @@ const updateRecipeById = async (req, res, next) => {
     })
   } catch (err) {
     // at least one request failed, transaction rolled back
+    next(err)
+  }
+}
+
+const updateRecipeSaveCount = async (req, res, next) => {
+  try {
+    const { id: recipeId } = req.params
+    const { id: userId } = req.user
+
+    const recipe = await Recipe.findByPk(recipeId, {
+      include: {
+        model: User,
+        attributes: ['id', 'name'],
+      },
+    })
+
+    // check if user has created this recipe
+    const createdBy = recipe.users.find(
+      (user) => user.id === userId && user.userRecipes.createdBy === true
+    )
+
+    // check if user has already saved recipe
+    const alreadySaved = recipe.users.find((user) => user.id === userId)
+
+    if (!alreadySaved) {
+      // TODO: execute as transaction?
+      const userRecipe = await recipe.addUser(userId, {
+        through: { isFavorite: true },
+      })
+      await recipe.increment('saveCount')
+
+      res.json({
+        success: true,
+        message: 'Added recipe to user favorites',
+        userRecipe,
+      })
+    } else if (alreadySaved && createdBy) {
+      let message
+      const userRecipe = createdBy.userRecipes
+
+      // TODO: execute as transaction?
+      // toggle isFavorite property & save record
+      userRecipe.isFavorite = !userRecipe.isFavorite
+      await userRecipe.save({
+        fields: ['isFavorite'],
+      })
+
+      if (userRecipe.isFavorite === true) {
+        await recipe.increment('saveCount')
+        message = 'Added recipe to user favorites'
+      } else {
+        await recipe.decrement('saveCount')
+        message = 'Removed recipe from user favorites'
+      }
+
+      res.json({
+        success: true,
+        message,
+        userRecipe,
+      })
+    } else {
+      // TODO: execute as transaction?
+      await recipe.removeUser(userId)
+      await recipe.decrement('saveCount')
+
+      res.json({
+        success: true,
+        message: 'Removed recipe from user favorites',
+      })
+    }
+  } catch (err) {
     next(err)
   }
 }
@@ -344,5 +415,6 @@ module.exports = {
   createRecipe,
   deleteRecipeById,
   updateRecipeById,
+  updateRecipeSaveCount,
   searchRecipesByIngredient,
 }
