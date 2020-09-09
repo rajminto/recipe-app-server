@@ -48,7 +48,7 @@ const getRecipeById = (req, res, next) => {
         attributes: ['id', 'name'],
         through: {
           where: { createdBy: true },
-          attributes: ['createdBy', 'isFavorite'],
+          attributes: ['id', 'createdBy', 'isFavorite'],
         },
       },
       { model: Ingredient, attributes: ['id', 'name'] },
@@ -207,7 +207,6 @@ const updateRecipeSaveCount = async (req, res, next) => {
       include: {
         model: User,
         attributes: ['id', 'name'],
-        through: { attributes: ['id', 'createdBy', 'isFavorite'] },
       },
     })
 
@@ -217,34 +216,32 @@ const updateRecipeSaveCount = async (req, res, next) => {
     )
 
     // check if user has already saved recipe
-    const alreadySaved = recipe.users.some((user) => user.id === userId)
+    const alreadySaved = recipe.users.find((user) => user.id === userId)
 
     if (!alreadySaved) {
-      // create association between current user and recipe
       // TODO: execute as transaction?
-      await recipe.addUser(userId, {
+      const userRecipe = await recipe.addUser(userId, {
         through: { isFavorite: true },
       })
-
-      // increment recipe saveCount field
       await recipe.increment('saveCount')
 
       res.json({
         success: true,
         message: 'Added recipe to user favorites',
-        createdBy,
-        alreadySaved,
-        recipe,
+        userRecipe,
       })
     } else if (alreadySaved && createdBy) {
-      const userRecipeInstance = createdBy.userRecipes
       let message
+      const userRecipe = createdBy.userRecipes
 
+      // TODO: execute as transaction?
       // toggle isFavorite property & save record
-      userRecipeInstance.isFavorite = !userRecipeInstance.isFavorite
-      await userRecipeInstance.save({ fields: ['isFavorite'] })
+      userRecipe.isFavorite = !userRecipe.isFavorite
+      await userRecipe.save({
+        fields: ['isFavorite'],
+      })
 
-      if (userRecipeInstance.isFavorite === true) {
+      if (userRecipe.isFavorite === true) {
         await recipe.increment('saveCount')
         message = 'Added recipe to user favorites'
       } else {
@@ -255,22 +252,16 @@ const updateRecipeSaveCount = async (req, res, next) => {
       res.json({
         success: true,
         message,
-        userRecipe: userRecipeInstance,
+        userRecipe,
       })
     } else {
       // TODO: execute as transaction?
-      // remove association between current user and recipe
       await recipe.removeUser(userId)
-
-      // decrement recipe saveCount field
       await recipe.decrement('saveCount')
 
       res.json({
         success: true,
         message: 'Removed recipe from user favorites',
-        createdBy,
-        alreadySaved,
-        recipe,
       })
     }
   } catch (err) {
