@@ -221,7 +221,10 @@ const updateRecipeSaveCount = async (req, res, next) => {
 
     if (!alreadySaved) {
       // create association between current user and recipe
-      await recipe.addUser(userId)
+      // TODO: execute as transaction?
+      await recipe.addUser(userId, {
+        through: { isFavorite: true },
+      })
 
       // increment recipe saveCount field
       await recipe.increment('saveCount')
@@ -234,6 +237,7 @@ const updateRecipeSaveCount = async (req, res, next) => {
       })
     } else if (alreadySaved && createdBy) {
       // TODO: toggle isFavorite property
+      // TODO: execute as transaction?
       res.json({
         status:
           'unchanged, toggling favorite of user created recipe incoming...',
@@ -243,6 +247,7 @@ const updateRecipeSaveCount = async (req, res, next) => {
       })
     } else {
       // remove association between current user and recipe
+      // TODO: execute as transaction?
       await recipe.removeUser(userId)
 
       // decrement recipe saveCount field
