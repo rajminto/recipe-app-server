@@ -9,6 +9,7 @@ module.exports = (sequelize, DataTypes) => {
       prep_time: DataTypes.STRING,
       cook_time: DataTypes.STRING,
       isPrivate: DataTypes.BOOLEAN,
+      saveCount: DataTypes.INTEGER,
     },
     {}
   )
