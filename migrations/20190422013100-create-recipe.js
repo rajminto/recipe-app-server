@@ -38,7 +38,7 @@ module.exports = {
       },
       saveCount: {
         type: Sequelize.INTEGER,
-        defaultValue: 1,
+        defaultValue: 0,
       },
       createdAt: {
         allowNull: false,
