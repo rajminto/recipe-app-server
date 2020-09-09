@@ -141,8 +141,6 @@ const deleteRecipeById = (req, res, next) => {
     .catch(next)
 }
 
-// --------------------------------------------------------
-
 const updateRecipeById = async (req, res, next) => {
   const { ingredients, instructions, tags } = req.body
   const { id: recipeId } = req.params
@@ -195,50 +193,6 @@ const updateRecipeById = async (req, res, next) => {
     // at least one request failed, transaction rolled back
     next(err)
   }
-}
-
-// --------------------------------------------------------
-
-const updateRecipeByIdOld = (req, res, next) => {
-  // TODO: add validation
-  const { ingredients, instructions, tags } = req.body
-  const recipeId = req.params.id
-
-  // TODO: Refactor into models/recipe.js
-  // Initialize sequelize transaction to execute multiple queries as atomic operation
-  db.sequelize
-    .transaction((t) => {
-      // Create all db requests as promises
-      const recipeUpdate = updateRecipePromise(Recipe, req.body, recipeId, t)
-      const ingredientUpserts = belongsToRecipeUpserts(
-        Ingredient,
-        ingredients,
-        recipeId,
-        t
-      )
-      const instructionUpserts = belongsToRecipeUpserts(
-        Instruction,
-        instructions,
-        recipeId,
-        t
-      )
-      const tagUpserts = belongsToManyRecipeUpserts(Tag, tags, recipeId, t)
-
-      // Execute all db requests
-      return Promise.all([
-        recipeUpdate,
-        ...ingredientUpserts,
-        ...instructionUpserts,
-        ...tagUpserts,
-      ])
-    })
-    .then((responses) => {
-      // All requests succeeded: transaction committed
-      res.json({ message: 'Recipe updated.', responses: responses })
-    })
-    .catch(next)
-  // At least one request failed: transaction rolled back
-  // TODO: custom error handling
 }
 
 const searchRecipesByIngredient = (req, res, next) => {
