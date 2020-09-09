@@ -189,7 +189,7 @@ const updateRecipeById = async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: 'Recipe updated successfully!',
-      result,
+      recipe: result,
     })
   } catch (err) {
     // at least one request failed, transaction rolled back
