@@ -99,7 +99,7 @@ const createRecipe = (req, res, next) => {
           transaction: t,
         })
 
-        // associate created recipe with logged in user
+        // associate created recipe with logged in user as creator
         await newRecipe.addUser(userId, {
           through: { createdBy: true },
           transaction: t,
@@ -141,46 +141,58 @@ const deleteRecipeById = (req, res, next) => {
     .catch(next)
 }
 
-const updateRecipeById = (req, res, next) => {
-  // TODO: add validation
+const updateRecipeById = async (req, res, next) => {
   const { ingredients, instructions, tags } = req.body
-  const recipeId = req.params.id
+  const { id: recipeId } = req.params
 
-  // TODO: Refactor into models/recipe.js
-  // Initialize sequelize transaction to execute multiple queries as atomic operation
-  db.sequelize
-    .transaction((t) => {
-      // Create all db requests as promises
-      const recipeUpdate = updateRecipePromise(Recipe, req.body, recipeId, t)
-      const ingredientUpserts = belongsToRecipeUpserts(
-        Ingredient,
-        ingredients,
-        recipeId,
-        t
-      )
-      const instructionUpserts = belongsToRecipeUpserts(
-        Instruction,
-        instructions,
-        recipeId,
-        t
-      )
-      const tagUpserts = belongsToManyRecipeUpserts(Tag, tags, recipeId, t)
+  try {
+    const result = await db.sequelize.transaction(async (t) => {
+      const recipe = await Recipe.findByPk(recipeId, { transaction: t })
 
-      // Execute all db requests
-      return Promise.all([
-        recipeUpdate,
-        ...ingredientUpserts,
-        ...instructionUpserts,
-        ...tagUpserts,
-      ])
+      // update basic recipe info
+      await recipe.update(req.body, { transaction: t })
+
+      // reset recipe ingredient associations
+      await recipe.setIngredients([], { transaction: t })
+
+      // associate new ingredients with recipe
+      const newIngredients = ingredients.map((ingredient) => {
+        ingredient.recipeId = recipeId
+        return ingredient
+      })
+
+      // create new ingredients
+      await Ingredient.bulkCreate(newIngredients, { transaction: t })
+
+      // reset recipe instruction associations
+      await recipe.setInstructions([])
+
+      // associate new instructions wth recipe
+      const newInstructions = instructions.map((instruction) => {
+        instruction.recipeId = recipeId
+        return instruction
+      })
+
+      // create new instructions
+      await Instruction.bulkCreate(newInstructions, { transaction: t })
+
+      // update tag associations (replacing previous)
+      const tagIds = mapTagNamesIntoIds(tags)
+      await recipe.setTags(tagIds, { transaction: t })
+
+      return recipe
     })
-    .then((responses) => {
-      // All requests succeeded: transaction committed
-      res.json({ message: 'Recipe updated.', responses: responses })
+
+    // transaction succeeded, respond to client
+    res.status(200).json({
+      success: true,
+      message: 'Recipe updated successfully!',
+      recipe: result,
     })
-    .catch(next)
-  // At least one request failed: transaction rolled back
-  // TODO: custom error handling
+  } catch (err) {
+    // at least one request failed, transaction rolled back
+    next(err)
+  }
 }
 
 const searchRecipesByIngredient = (req, res, next) => {
@@ -277,15 +289,6 @@ function mapTagNamesIntoIds(tagNames) {
         break
       case 'contains-gluten':
         tagId = 6
-        break
-      case 'contains-poultry':
-        tagId = 7
-        break
-      case 'contains-fish':
-        tagId = 8
-        break
-      case 'contains-dairy':
-        tagId = 9
         break
       default:
         break
