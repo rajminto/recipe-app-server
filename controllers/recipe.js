@@ -47,7 +47,7 @@ const getRecipeById = (req, res, next) => {
         model: User,
         attributes: ['id', 'name'],
         through: {
-          // where: { createdBy: true },
+          where: { createdBy: true },
           attributes: ['createdBy', 'isFavorite'],
         },
       },
@@ -230,45 +230,44 @@ const updateRecipeSaveCount = async (req, res, next) => {
       await recipe.increment('saveCount')
 
       res.json({
-        status: 'added association',
+        success: true,
+        message: 'Added recipe to user favorites',
         createdBy,
         alreadySaved,
         recipe,
       })
     } else if (alreadySaved && createdBy) {
       const userRecipeInstance = createdBy.userRecipes
+      let message
 
       // toggle isFavorite property & save record
       userRecipeInstance.isFavorite = !userRecipeInstance.isFavorite
       await userRecipeInstance.save({ fields: ['isFavorite'] })
 
-      // TODO: increment/decrement saveCount appropriately
       if (userRecipeInstance.isFavorite === true) {
         await recipe.increment('saveCount')
+        message = 'Added recipe to user favorites'
       } else {
         await recipe.decrement('saveCount')
+        message = 'Removed recipe from user favorites'
       }
 
       res.json({
         success: true,
-        message: 'Recipe favorite toggled',
-        createdBy,
+        message,
+        userRecipe: userRecipeInstance,
       })
-
-      // userRecipeInstance.update({ isFavorite: true })
-      // res.json({
-      //   userRecipeInstance,
-      // })
     } else {
-      // remove association between current user and recipe
       // TODO: execute as transaction?
+      // remove association between current user and recipe
       await recipe.removeUser(userId)
 
       // decrement recipe saveCount field
       await recipe.decrement('saveCount')
 
       res.json({
-        status: 'removed association',
+        success: true,
+        message: 'Removed recipe from user favorites',
         createdBy,
         alreadySaved,
         recipe,

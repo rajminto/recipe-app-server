@@ -26,6 +26,7 @@ module.exports = {
           createdAt: new Date(),
           updatedAt: new Date(),
           isPrivate: false,
+          saveCount: 1,
         },
       ],
       {}
