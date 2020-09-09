@@ -47,7 +47,7 @@ const getRecipeById = (req, res, next) => {
         model: User,
         attributes: ['id', 'name'],
         through: {
-          where: { createdBy: true },
+          // where: { createdBy: true },
           attributes: ['createdBy', 'isFavorite'],
         },
       },
@@ -207,12 +207,12 @@ const updateRecipeSaveCount = async (req, res, next) => {
       include: {
         model: User,
         attributes: ['id', 'name'],
-        through: { attributes: ['createdBy'] },
+        through: { attributes: ['id', 'createdBy', 'isFavorite'] },
       },
     })
 
     // check if user has created this recipe
-    const createdBy = recipe.users.some(
+    const createdBy = recipe.users.find(
       (user) => user.id === userId && user.userRecipes.createdBy === true
     )
 
@@ -230,21 +230,35 @@ const updateRecipeSaveCount = async (req, res, next) => {
       await recipe.increment('saveCount')
 
       res.json({
-        status: 'changed',
+        status: 'added association',
         createdBy,
         alreadySaved,
         recipe,
       })
     } else if (alreadySaved && createdBy) {
-      // TODO: toggle isFavorite property
-      // TODO: execute as transaction?
+      const userRecipeInstance = createdBy.userRecipes
+
+      // toggle isFavorite property & save record
+      userRecipeInstance.isFavorite = !userRecipeInstance.isFavorite
+      await userRecipeInstance.save({ fields: ['isFavorite'] })
+
+      // TODO: increment/decrement saveCount appropriately
+      if (userRecipeInstance.isFavorite === true) {
+        await recipe.increment('saveCount')
+      } else {
+        await recipe.decrement('saveCount')
+      }
+
       res.json({
-        status:
-          'unchanged, toggling favorite of user created recipe incoming...',
+        success: true,
+        message: 'Recipe favorite toggled',
         createdBy,
-        alreadySaved,
-        recipe,
       })
+
+      // userRecipeInstance.update({ isFavorite: true })
+      // res.json({
+      //   userRecipeInstance,
+      // })
     } else {
       // remove association between current user and recipe
       // TODO: execute as transaction?
