@@ -10,5 +10,6 @@ router.get('/:id', controller.getRecipeById)
 router.post('/', auth.checkAuthenticated, controller.createRecipe)
 router.delete('/:id', controller.deleteRecipeById)
 router.put('/:id', controller.updateRecipeById)
+router.patch('/:id', auth.checkAuthenticated, controller.updateRecipeSaveCount)
 
 module.exports = router

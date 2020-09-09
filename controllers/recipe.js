@@ -198,6 +198,52 @@ const updateRecipeById = async (req, res, next) => {
   }
 }
 
+const updateRecipeSaveCount = async (req, res, next) => {
+  try {
+    const { id: recipeId } = req.params
+    const { id: userId } = req.user
+
+    const recipe = await Recipe.findByPk(recipeId, {
+      include: {
+        model: User,
+        attributes: ['id', 'name'],
+        through: { attributes: ['createdBy'] },
+      },
+    })
+
+    // check if user has created this recipe
+    const createdBy = recipe.users.some(
+      (user) => user.id === userId && user.userRecipes.createdBy === true
+    )
+
+    // check if user has already saved recipe
+    const alreadySaved = recipe.users.some((user) => user.id === userId)
+
+    if (!alreadySaved) {
+      // create association between current user and recipe
+      const addUser = await recipe.addUser(req.user.id)
+
+      // increment recipe saveCount field
+      const increment = await recipe.increment('saveCount')
+      res.json({
+        status: 'changed',
+        createdBy,
+        alreadySaved,
+        recipe,
+      })
+    } else {
+      res.json({
+        status: 'unchanged',
+        createdBy,
+        alreadySaved,
+        recipe,
+      })
+    }
+  } catch (err) {
+    next(err)
+  }
+}
+
 const searchRecipesByIngredient = (req, res, next) => {
   const ingredient = req.query.ingredient
   const Op = db.Sequelize.Op
@@ -344,5 +390,6 @@ module.exports = {
   createRecipe,
   deleteRecipeById,
   updateRecipeById,
+  updateRecipeSaveCount,
   searchRecipesByIngredient,
 }
